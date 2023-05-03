@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
-import crypto from "crypto";
 
 const { Schema, model } = mongoose;
 
-const userSchema = new Schema({
+// Create a schema for an enumerator
+const EnumeratorSchema = new Schema({
   firstName: {
     type: String,
     required: [true, "Please enter a first name"],
@@ -14,8 +14,8 @@ const userSchema = new Schema({
   },
   lastName: {
     type: String,
-    required: [true, "Please enter a last name"],
-    maxLength: [30, "Last name cannot exceed 30 characters"],
+    required: [true, "Please enter a first name"],
+    maxLength: [30, "First name cannot exceed 30 characters"],
   },
   email: {
     type: String,
@@ -25,17 +25,21 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-    required: [true, "Please enter your password"],
+    required: true,
     minlenght: [6, "Password must be at least 6 characters"],
     select: false,
+  },
+  phoneNumber: {
+    type: String,
+    required: true,
+  },
+  id: {
+    type: String,
+    required: true,
   },
   state: {
     type: String,
     required: true,
-  },
-  role: {
-    type: String,
-    default: "teamlead",
   },
   LGA: [
     {
@@ -43,15 +47,14 @@ const userSchema = new Schema({
       required: true,
     },
   ],
-  enumerators: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Enumerator",
-    },
-  ],
+  User: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
 });
 
-userSchema.pre("save", async function (next) {
+EnumeratorSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -60,30 +63,16 @@ userSchema.pre("save", async function (next) {
 });
 
 // Define a Schema method to check if the password matches
-userSchema.methods.isPasswordMatch = async function (enteredPassword) {
+EnumeratorSchema.methods.isPasswordMatch = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // Get JWT token
-userSchema.methods.getJwtToken = function () {
+EnumeratorSchema.methods.getJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_SECRET_EXPIRES,
   });
 };
 
-// Generate password reset token
-userSchema.methods.getResetPasswordToken = function () {
-  // Generate the password reset token
-  const resetPasswordToken = crypto.randomBytes(20).toString("hex");
-  this.resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(resetPasswordToken)
-    .digest("hex");
-
-  // Set reset password token expiration time
-  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
-
-  return resetPasswordToken;
-};
-
-export default model("User", userSchema);
+// Create a model from the schema and export
+export default model("Enumerator", EnumeratorSchema);
