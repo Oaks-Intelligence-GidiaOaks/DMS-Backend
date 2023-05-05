@@ -1,0 +1,60 @@
+{
+    "foodItems": [
+        {
+            "name": "rice 1cup",
+            "price": 3000,
+            "brand": "cap"
+        },
+        {
+            "name": "rice 50KG",
+            "price": 30000,
+            "brand": "cap"
+        },
+        {
+            "name": "beans 1Cup",
+            "price": 300,
+            "brand": "local"
+        },
+        {
+            "name": "beans 50kg",
+            "price": 30000
+        }
+    ],
+    "transports": [
+        {
+            "from": "ikeja",
+            "to": "ikorodu",
+            "mode": "Uber",
+            "cost": 5000
+        },
+        {
+            "from": "abuja",
+            "to": "lagos",
+            "mode": "Public",
+            "cost": 50000
+        }
+    ],
+    "accomodations": [
+        {
+            "type": "duplex",
+            "rooms": 5,
+            "price": 500000
+        },
+        {
+            "type": "self Contain",
+            "rooms": 1,
+            "price": 150000
+        }
+    ],
+    "questions": [
+        {
+            "question": "Was there Issues in Your Community",
+            "response": true,
+            "comment": "everybody ran away"
+        },
+        {
+             "question": "Was there Light in Your Community",
+            "response": false
+        }
+    ]
+}
