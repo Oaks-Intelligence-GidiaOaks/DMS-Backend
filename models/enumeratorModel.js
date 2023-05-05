@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
+import moment from "moment";
 
 const { Schema, model } = mongoose;
 
@@ -29,6 +30,10 @@ const EnumeratorSchema = new Schema({
     minlenght: [6, "Password must be at least 6 characters"],
     select: false,
   },
+  passwordExpiresAt: {
+    type: Date,
+    default: () => moment().add(7, 'days')
+  },
   phoneNumber: {
     type: String,
     required: true,
@@ -47,7 +52,7 @@ const EnumeratorSchema = new Schema({
       required: true,
     },
   ],
-  User: {
+  user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
