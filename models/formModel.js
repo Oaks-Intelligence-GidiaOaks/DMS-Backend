@@ -26,13 +26,25 @@ const FormSchema = new Schema({
       ref: "Transport",
     },
   ],
+  electricity: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Electricity",
+    },
+  ],
+  others: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OtherProduct",
+    },
+  ],
   questions: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Question",
     },
   ],
-  crated_at: { type: Date, default: new Date() },
+  created_at: { type: Date, default: new Date() },
 });
 
 export default model("Form", FormSchema);

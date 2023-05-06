@@ -1,6 +1,6 @@
 import Jwt from "jsonwebtoken";
 import ErrorHandler from "../utils/errorHandler.js";
-import catchAsyncErrors from "./catchAsyncErrors.js";
+import catchAsyncErrors from "./catchAsyncError.js";
 import User from "../models/userModel.js";
 
 // Check if user is authenticated

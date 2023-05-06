@@ -43,7 +43,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 // routes
-app.use("/form", formRoutes);
+app.use("/api/v1/form", formRoutes);
 
 // Error handling middleware
 app.use(errorMiddleWare);
