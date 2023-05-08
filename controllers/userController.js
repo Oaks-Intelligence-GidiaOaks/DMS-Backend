@@ -6,7 +6,7 @@ import sendToken from "../utils/sendToken.js";
 import generatePassword from "../utils/generatePassword.js";
 import sendEmail from "../utils/sendEmail.js";
 
-// Create team lead/admin api/v1/new/user ****
+// Create team lead/admin api/v1/user/new ****
 export const createUser = catchAsyncErrors(async (req, res, next) => {
   const { firstName, lastName, email, state, LGA } = req.body;
   const user = await User.findOne({ email });
@@ -43,7 +43,7 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-// Create team lead/admin api/v1/new/enumerator ****
+// Create team lead/admin api/v1/enumerator/new ****
 export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
   const { firstName, lastName, email, phoneNumber, id, state, LGA } = req.body;
 
@@ -105,6 +105,13 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
+  if (user.disabled) {
+    new ErrorHandler(
+      "Your account has been disabled. Please contact the administrator for assistance",
+      401
+    );
+  }
+
   const passwordMatch = user.isPasswordMatch(password);
 
   if (user && passwordMatch) {
@@ -116,3 +123,235 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
     );
   }
 });
+
+// Forgot password => api/v1/password/reset ****
+export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+
+  if (!user) {
+    next(new ErrorHandler("Email not found", 404));
+  }
+
+  // Get reset password token
+  const resetPasswordToken = user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetPasswordUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/password/reset/${resetPasswordToken}`;
+
+  // email message
+  const message = `Click this link to reset your password:\n\n${resetPasswordUrl}\n\nIf your have not requested a password reset please ignore.`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "ShopNow Password Reset",
+      message,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Email sent successfully to ${user.email}`,
+    });
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    // save user again
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// Reset password => api/v1/password/reset/:token ****
+export const resetPassword = catchAsyncErrors(async (req, res, next) => {
+  // Hash the url Token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(
+      new ErrorHandler("Password reset token is ivalid or has expired", 400)
+    );
+  }
+
+  if (req.body.password !== req.body.confirmPassword) {
+    return next(new ErrorHandler("Password does not match", 400));
+  }
+
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+  sendToken(user, 200, res);
+});
+
+// Get currently logged in user profile => api/v1/me ****
+export const getUserProfile = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id);
+
+  if (user.disabled) {
+    new ErrorHandler(
+      "Your account has been disabled. Please contact the administrator for assistance",
+      401
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+// Update password => api/v1/password/update ****
+export const updatePassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+
+  // Verify old password is correct
+  const VerifyPassword = await user.isPasswordMatch(req.body.oldPassword);
+
+  if (!VerifyPassword) {
+    return next(new ErrorHandler("Old password does not match", 400));
+  }
+
+  user.password = req.body.newPassword;
+  await user.save();
+  sendToken(user, 200, res);
+});
+
+// Update user details/profile => api/v1/me/update ****
+export const updateUserProfile = catchAsyncErrors(async (req, res, next) => {
+  const newUserDetails = {
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
+    id: req.body.id,
+    state: req.body.state,
+    LGA: req.body.LGA,
+  };
+
+  const user = await User.findByIdAndUpdate(req.user.id, newUserDetails, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+// Logout user => api/v1/logout ****
+export const logoutUser = catchAsyncErrors(async (req, res, next) => {
+  res.cookie("token", null, { expires: new Date(Date.now()), httpOnly: true });
+  res.status(200).json({
+    success: true,
+    message: "Logged out",
+  });
+});
+
+// Admin Routes ********
+
+// Get all users => api/v1/admin/users ****
+export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
+  const users = await User.find();
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});
+
+// Get specific user => api/v1/admin/users/:id ****
+export const getOneUser = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(
+      new ErrorHandler(`User with id ${req.params.id} does not exist`)
+    );
+  }
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+// Update user details/profile ADMIN => api/v1/admin/user/:id ****
+export const updateUserProfileAdmin = catchAsyncErrors(
+  async (req, res, next) => {
+    const newUserDetails = {
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      id: req.body.id,
+      state: req.body.state,
+      LGA: req.body.LGA,
+      role: req.body.role,
+    };
+
+    const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  }
+);
+
+// Disable enumerator ADMIN => api/v1/admin/enumerator/:id/disable ****
+export const disableEnumerator = catchAsyncErrors(async (req, res, next) => {
+  
+  const enumerator = await Enumerator.findByIdAndUpdate(req.params.id, { disabled: true }, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  if(!enumerator){
+    return next(new ErrorHandler(`User with id ${req.params.id} not found`))
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "enumerator disabled",
+  });
+});
+
+
+// Disable user ADMIN => api/v1/admin/enumerator/:id/disable ****
+export const disableUser = catchAsyncErrors(async (req, res, next) => {
+  
+  const user = await User.findByIdAndUpdate(req.params.id, { disabled: true }, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  if(!user){
+    return next(new ErrorHandler(`User with id ${req.params.id} not found`))
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "user disabled",
+  });
+});
+
