@@ -33,6 +33,10 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   role: {
     type: String,
     default: "teamlead",
@@ -49,6 +53,8 @@ const userSchema = new Schema({
       ref: "Enumerator",
     },
   ],
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
 });
 
 userSchema.pre("save", async function (next) {
@@ -87,3 +93,5 @@ userSchema.methods.getResetPasswordToken = function () {
 };
 
 export default model("User", userSchema);
+
+
