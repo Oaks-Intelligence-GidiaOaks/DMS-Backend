@@ -35,7 +35,7 @@ class APIQueries {
   searchByDateRange() {
     const startDate = this.queryString.startDate
       ? new Date(this.queryString.startDate)
-      : new Date("1970-01-01");
+      : new Date("2023-01-01");
     const endDate = this.queryString.endDate
       ? new Date(this.queryString.endDate)
       : new Date();
