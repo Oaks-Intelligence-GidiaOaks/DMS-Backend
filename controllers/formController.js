@@ -21,6 +21,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
       others,
     } = req.body;
     // validate here
+    console.log(req.enumerator);
 
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -31,7 +32,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
         const { name, price, brand } = item;
 
         let newProduct = await new Product({
-          // created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
           name,
           price,
           brand,
@@ -47,7 +48,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
         const { question, response, comment } = item;
 
         let newQuestion = await new Question({
-          // created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
           question,
           response,
           comment,
@@ -62,7 +63,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
         const { type, price } = item;
 
         let newAccomodation = await new Accomodation({
-          // created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
           type,
           // rooms,
           price,
@@ -76,7 +77,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
         const { hours_per_week } = item;
 
         let newElectricty = await new Electricity({
-          // created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
           hours_per_week,
         }).save();
         return newElectricty._id;
@@ -89,7 +90,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
         const { start, end, mode, cost } = item;
 
         let newTransport = await new Transport({
-          // created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
           start,
           end,
           mode,
@@ -105,7 +106,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
         const { name, price, brand } = item;
 
         let newOtherProduct = await new OtherProduct({
-          // created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
           name,
           price,
           brand,
@@ -117,7 +118,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
 
     // parent entry
     const newEntry = await new Form({
-      // created_by: req.enumerator._id,
+      created_by: req.enumerator._id,
       foodItems: food_ids,
       accomodations: accomodation_ids,
       transports: transport_ids,
@@ -135,7 +136,7 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
   } catch (error) {
     // Rollback any changes made in the database
     await session.abortTransaction();
-    return res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
     // return next(new ErrorHandler(error.message, 500));
   } finally {
     // Ending the session

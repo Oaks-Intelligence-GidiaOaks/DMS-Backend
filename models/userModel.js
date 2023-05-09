@@ -31,7 +31,6 @@ const userSchema = new Schema({
   },
   state: {
     type: String,
-    required: true,
   },
   disabled: {
     type: Boolean,
@@ -39,12 +38,11 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    default: "teamlead",
+    default: "team_lead",
   },
   LGA: [
     {
       type: String,
-      required: true,
     },
   ],
   enumerators: [

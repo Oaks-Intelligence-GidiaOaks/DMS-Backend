@@ -56,6 +56,9 @@ export const getAccomodation = catchAsyncErrors(async (req, res, next) => {
 export const getElectricity = catchAsyncErrors(async (req, res, next) => {
   try {
     const data = await Electricity.find().populate("created_by");
+    // const filteredData = data.filter((item) => {
+    //   return item.created_by.state === "Lagos";
+    // });
 
     res.status(200).json({ data });
   } catch (error) {

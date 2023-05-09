@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import { connectDb } from "./configs/connectDb.js";
 import formRoutes from "./routes/formRoutes.js";
 import formResponseRoutes from "./routes/formResponseRoute.js";
+import userRoute from "./routes/userRoutes.js";
+import enumeratorRoute from "./routes/enumeratorRoutes.js";
 
 // env config
 dotenv.config({
@@ -31,7 +33,7 @@ process.on("unhandledRejection", (err) => {
 });
 
 // port/environment
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 const ENV = process.env.ENV;
 
 // initialization
@@ -46,6 +48,8 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 // routes
 app.use("/api/v1/form", formRoutes);
 app.use("/api/v1/form_response", formResponseRoutes);
+app.use("/api/v1/", userRoute);
+app.use("/api/v1/", enumeratorRoute);
 
 // Error handling middleware
 app.use(errorMiddleWare);

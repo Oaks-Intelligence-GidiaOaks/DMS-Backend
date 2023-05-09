@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.get("/form_data", getFormData);
 
-router.post("/add_data", addFormData);
+router.post("/add_data", isAuthenticatedEnumerator, addFormData);
 
 export default router;

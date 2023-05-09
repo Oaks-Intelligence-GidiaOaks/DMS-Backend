@@ -6,7 +6,7 @@ const FormSchema = new Schema({
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Enumerator",
-    // required: true,
+    required: true,
   },
   foodItems: [
     {
