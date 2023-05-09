@@ -1,8 +1,9 @@
 import express from "express";
 import bodyParser from "body-parser";
-import errorMiddleWare from "./middlewares/error.js";
+import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import errorMiddleWare from "./middlewares/error.js";
 import { connectDb } from "./configs/connectDb.js";
 import formRoutes from "./routes/formRoutes.js";
 import formResponseRoutes from "./routes/formResponseRoute.js";
@@ -39,11 +40,15 @@ const ENV = process.env.ENV;
 // initialization
 const app = express();
 
+const corsOptions = {
+  origin: "*",
+  optionsSuccessStatus: 200,
+  credentials: true,
+};
 // middlewares
 app.use(cookieParser());
 app.use(express.json());
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(cors(corsOptions));
 
 // routes
 app.use("/api/v1/form", formRoutes);

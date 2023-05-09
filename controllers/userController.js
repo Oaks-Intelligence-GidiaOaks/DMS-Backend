@@ -6,6 +6,7 @@ import sendToken from "../utils/sendToken.js";
 import generatePassword from "../utils/generatePassword.js";
 import sendEmail from "../utils/sendEmail.js";
 
+
 // Create team lead/admin api/v1/user/new ****
 export const createUser = catchAsyncErrors(async (req, res, next) => {
   const { firstName, lastName, email, state, LGA } = req.body;
@@ -54,7 +55,11 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
     const enumerator = await Enumerator.findOne({ email });
 
     if (enumerator) {
-      return next(new ErrorHandler("Enumerator already exists", 409));
+      // return next(new ErrorHandler("Enumerator already exists", 409));
+      res.status(409).json({
+        success: false,
+        message: `Enumerator already exists`,
+      })
     }
 
     // Generate enumerator password
@@ -273,18 +278,23 @@ export const logoutUser = catchAsyncErrors(async (req, res, next) => {
 // Get all users => api/v1/admin/users ****
 export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
   const users = await User.find();
-  if (users) {
-    // return next(new ErrorHandler("hello my nigga", 400));
-    res.status(400).json({
-      success: false,
-      message: "error",
-    });
-  }
-  // res.status(200).json({
-  //   success: true,
-  //   users,
-  // });
+  
+  res.status(200).json({
+    success: true,
+    users,
+  });
 });
+
+// Get all enumerators api/v1/enumerators
+export const getAllEnumerators = catchAsyncErrors(async (req, res, next) => {
+  const enumerators = await Enumerator.find();
+
+  res.status(200).json({
+    message: "success",
+    enumerators,
+  });
+});
+
 
 // Get specific user => api/v1/admin/users/:id ****
 export const getOneUser = catchAsyncErrors(async (req, res, next) => {

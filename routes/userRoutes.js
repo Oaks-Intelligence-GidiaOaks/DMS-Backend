@@ -4,6 +4,7 @@ import {
   createEnumerator,
   forgotPassword,
   getAllUsers,
+  getAllEnumerators,
   getOneUser,
   getUserProfile,
   loginUser,
@@ -32,7 +33,8 @@ router.get("/me", isAuthenticatedUser, getUserProfile);
 router.put("/me/update", isAuthenticatedUser, updateUserProfile);
 router.put("/password/update", isAuthenticatedUser, updatePassword);
  
-router.get("/admin/users", getAllUsers)
+router.get("/admin/users",isAuthenticatedUser, authorizeRoles('super_admin'), getAllUsers)
+router.get("/admin/enumerators",isAuthenticatedUser, authorizeRoles('super_admin'), getAllEnumerators)
 router.get("/admin/user/:id", isAuthenticatedUser, authorizeRoles('super_admin'), getOneUser)
 router.put("/admin/user/:id", isAuthenticatedUser, authorizeRoles('super_admin'), updateUserProfileAdmin)
 router.put("/admin/user/:id", isAuthenticatedUser, authorizeRoles('super_admin'), disableUser)
