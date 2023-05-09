@@ -3,144 +3,48 @@ import mongoose from "mongoose";
 import { Schema, model } from "mongoose";
 
 const FormSchema = new Schema({
-  categories: [
+  created_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Enumerator",
+    required: true,
+  },
+  foodItems: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
+      ref: "Product",
     },
   ],
-  kerosene: {
-    oneLitre: {
-      price: Number,
+  accomodations: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Accomodation",
     },
-  },
-  cookingGas: {
-    twelveKg: {
-      price: Number,
+  ],
+  transports: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Transport",
     },
-  },
-  fish: {
-    oneFish: {
-      type: String,
-      price: Number,
+  ],
+  electricity: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Electricity",
     },
-  },
-  beef: {
-    fivePieces: {
-      price: Number,
+  ],
+  others: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OtherProduct",
     },
-  },
-  chicken: {
-    oneKg: {
-      price: Number,
+  ],
+  questions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Question",
     },
-  },
-  turkey: {
-    oneKg: {
-      price: Number,
-    },
-  },
-  bread: {
-    oneLoaf: {
-      price: Number,
-    },
-  },
-  egg: {
-    crate: {
-      price: Number,
-    },
-  },
-  yam: {
-    oneStandardSize: {
-      price: Number,
-    },
-  },
-  palmOil: {
-    oneLitre: {
-      price: Number,
-    },
-  },
-  groundnutOil: {
-    oneLitre: {
-      price: Number,
-    },
-  },
-  firewood: {
-    oneBundle: {
-      price: Number,
-    },
-  },
-  charcoal: {
-    oneBag: {
-      amount: {
-        type: String,
-        enum: ["50 Kg", "100 Kg"],
-      },
-      price: Number,
-    },
-  },
-  diesel: {
-    oneLitre: {
-      price: Number,
-    },
-  },
-  petrol: {
-    oneLitre: {
-      price: Number,
-    },
-  },
-  cement: {
-    fiftyKgBag: {
-      brand: {
-        type: String,
-        enum: ["Dangote", "Ibeto", "BUA"],
-      },
-      price: Number,
-    },
-  },
-  buildingBlock: {
-    size: {
-      type: String,
-      enum: ["6-inch", "9-inch", "Other"],
-    },
-    price: Number,
-  },
-  accommodationRentOneBedSelfContainPerYear: {
-    price: Number,
-  },
-  accommodationRentTwoBedroomFlatPerYear: {
-    price: Number,
-  },
-  accommodationRentThreeBedroomFlatPerYear: {
-    price: Number,
-  },
-  accommodationRentDuplexPerYear: {
-    price: Number,
-  },
-  routeOne: {
-    route: String,
-    modeOfTransport: {
-      type: String,
-      enum: ["Bike", "Keke", "Bus", "Other"],
-    },
-    transportCost: Number,
-  },
-  routeTwo: {
-    route: String,
-    modeOfTransport: {
-      type: String,
-      enum: ["Bike", "Keke", "Bus", "Other"],
-    },
-    transportCost: Number,
-  },
-  routeThree: {
-    route: String,
-    modeOfTransport: { type: String, enum: ["Bike", "Keke", "Bus", "Other"] },
-    transportCost: Number,
-  },
-  governmentProject: { exists: Boolean, link: String },
-  crimeReport: { exists: Boolean, link: String, details: String },
-  accidentReport: { exists: Boolean, link: String, details: String },
+  ],
+  created_at: { type: Date, default: new Date() },
 });
 
-export default model("Form", FormSchema)
+export default model("Form", FormSchema);

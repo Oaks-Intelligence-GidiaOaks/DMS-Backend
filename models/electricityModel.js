@@ -2,16 +2,14 @@ import mongoose from "mongoose";
 
 const { Schema, model } = mongoose;
 
-const productSchema = new Schema({
+const electricitySchema = new Schema({
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Enumerator",
     // required: true,
   },
-  name: { type: String, required: true },
-  price: { type: Number, required: true },
-  brand: { type: String },
+  hours_per_week: { type: Number, required: true },
   created_at: { type: Date, default: new Date() },
 });
 
-export default model("Product", productSchema);
+export default model("Electricity", electricitySchema);

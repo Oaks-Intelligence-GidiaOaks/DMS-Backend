@@ -4,8 +4,10 @@ import errorMiddleWare from "./middlewares/error.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectDb } from "./configs/connectDb.js";
-import userRoute from "./routes/userRoutes.js"
-import enumeratorRoute from "./routes/enumeratorRoutes.js"
+import formRoutes from "./routes/formRoutes.js";
+import formResponseRoutes from "./routes/formResponseRoute.js";
+import userRoute from "./routes/userRoutes.js";
+import enumeratorRoute from "./routes/enumeratorRoutes.js";
 
 // env config
 dotenv.config({
@@ -34,7 +36,6 @@ process.on("unhandledRejection", (err) => {
 const PORT = process.env.PORT || 8000;
 const ENV = process.env.ENV;
 
-
 // initialization
 const app = express();
 
@@ -45,11 +46,14 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 // routes
-app.use("/api/v1/", userRoute)
-app.use("/api/v1/", enumeratorRoute)
+app.use("/api/v1/form", formRoutes);
+app.use("/api/v1/form_response", formResponseRoutes);
+app.use("/api/v1/", userRoute);
+app.use("/api/v1/", enumeratorRoute);
 
 // Error handling middleware
 app.use(errorMiddleWare);
 
-
-app.listen(PORT, () => console.log(`App is listening on port ${PORT} in ${ENV} mode`));
+app.listen(PORT, () =>
+  console.log(`App is listening on port ${PORT} in ${ENV} mode`)
+);
