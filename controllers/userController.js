@@ -355,3 +355,13 @@ export const disableUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+export const seed = catchAsyncErrors(async (req, res) => {
+  try {
+    const { firstName, lastName, password, email, state, LGA, role } = req.body;
+    const user = await User.create({ firstName, lastName, email, state, username, password, LGA, role });
+    res.status(201).json({ message: 'Super admin created successfully!', user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+});

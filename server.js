@@ -4,6 +4,7 @@ import errorMiddleWare from "./middlewares/error.js";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectDb } from "./configs/connectDb.js";
+import userRoute from "./routes/userRoutes.js"
 
 // env config
 dotenv.config({
@@ -43,7 +44,7 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 // routes
-
+app.use("api/v1/", userRoute)
 
 // Error handling middleware
 app.use(errorMiddleWare);

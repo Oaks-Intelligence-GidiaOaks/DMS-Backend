@@ -1,8 +1,8 @@
 import Jwt from "jsonwebtoken";
 import ErrorHandler from "../utils/errorHandler.js";
-import catchAsyncErrors from "./catchAsyncErrors.js";
 import User from "../models/userModel.js";
 import Enumerator from "../models/enumeratorModel.js";
+import catchAsyncErrors from "./catchAsyncError.js";
 
 // Check if user is authenticated
 export const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {

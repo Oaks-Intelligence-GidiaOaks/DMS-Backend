@@ -39,7 +39,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    default: "teamlead",
+    default: "team_lead",
   },
   LGA: [
     {

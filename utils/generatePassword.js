@@ -11,3 +11,5 @@ function generatePassword(length = 12) {
 
     return password;
 }
+
+export default generatePassword;
