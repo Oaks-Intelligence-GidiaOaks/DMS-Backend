@@ -5,7 +5,7 @@ import { Schema, model } from "mongoose";
 const FormSchema = new Schema({
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Enumerator",
     // required: true,
   },
   foodItems: [

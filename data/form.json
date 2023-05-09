@@ -20,16 +20,24 @@
             "price": 30000
         }
     ],
+    "others": [
+        {
+            "name": "bolt",
+            "price": 3000,
+            "brand": "car"
+        }
+   
+    ],
     "transports": [
         {
-            "from": "ikeja",
-            "to": "ikorodu",
+            "start": "ikeja",
+            "end": "ikorodu",
             "mode": "Uber",
             "cost": 5000
         },
         {
-            "from": "abuja",
-            "to": "lagos",
+            "start": "abuja",
+            "end": "lagos",
             "mode": "Public",
             "cost": 50000
         }
@@ -37,13 +45,16 @@
     "accomodations": [
         {
             "type": "duplex",
-            "rooms": 5,
             "price": 500000
         },
         {
             "type": "self Contain",
-            "rooms": 1,
             "price": 150000
+        }
+    ],
+    "electricity": [
+        {
+            "hours_per_week": 200
         }
     ],
     "questions": [

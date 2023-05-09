@@ -5,7 +5,7 @@ const { Schema, model } = mongoose;
 const accomodationSchema = new Schema({
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Enumerator",
     // required: true,
   },
   type: { type: String, required: true },

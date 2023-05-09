@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectDb } from "./configs/connectDb.js";
 import formRoutes from "./routes/formRoutes.js";
+import formResponseRoutes from "./routes/formResponseRoute.js";
 
 // env config
 dotenv.config({
@@ -44,6 +45,7 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 // routes
 app.use("/api/v1/form", formRoutes);
+app.use("/api/v1/form_response", formResponseRoutes);
 
 // Error handling middleware
 app.use(errorMiddleWare);

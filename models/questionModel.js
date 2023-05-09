@@ -5,7 +5,7 @@ const { Schema, model } = mongoose;
 const questionSchema = new Schema({
   created_by: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Enumerator",
     // required: true,
   },
   question: { type: String, required: true },
