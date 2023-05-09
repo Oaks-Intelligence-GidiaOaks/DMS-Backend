@@ -15,14 +15,14 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("User already exists", 409));
   }
 
-  const password = generatePassword();
+  // const password = generatePassword();
   console.log(password, "** pass test hash check");
 
   const newUser = await User.create({
     firstName,
     lastName,
     email,
-    password,
+    password: "123456",
     state,
     LGA,
   });
@@ -45,43 +45,49 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
 
 // Create team lead/admin api/v1/enumerator/new ****
 export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, email, phoneNumber, id, state, LGA } = req.body;
+  try {
+    const { firstName, lastName, email, phoneNumber, id, state, LGA } =
+      req.body;
 
-  const enumerator = await Enumerator.findOne({ email });
+    console.log(req, "****id");
 
-  if (enumerator) {
-    return next(new ErrorHandler("Enumerator already exists", 409));
-  }
+    const enumerator = await Enumerator.findOne({ email });
 
-  // Generate enumerator password
-  const password = generatePassword();
-
-  // Create the enumerator
-  const newEnumerator = await Enumerator.create({
-    firstName,
-    lastName,
-    email,
-    password,
-    phoneNumber,
-    id,
-    state,
-    LGA,
-    user: req.user.id,
-  });
-
-  sendToken(newEnumerator, 200, res);
-
-  // send password to user email address
-  if (newEnumerator) {
-    try {
-      sendEmail({
-        email,
-        subject: "Gidiaoks DCF Password",
-        message: `Please sign in to DCF with this password: ${password}. Please note that password expires after 7 days`,
-      });
-    } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
+    if (enumerator) {
+      return next(new ErrorHandler("Enumerator already exists", 409));
     }
+
+    // Generate enumerator password
+    const password = generatePassword();
+
+    // Create the enumerator
+    const newEnumerator = await Enumerator.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      phoneNumber,
+      id,
+      state,
+      LGA,
+      user: req.user._id,
+    });
+
+    // send password to user email address
+    if (newEnumerator) {
+      try {
+        sendEmail({
+          email,
+          subject: "Gidiaoks DCF Password",
+          message: `Please sign in to DCF with this password: ${password}. Please note that password expires after 7 days`,
+        });
+        sendToken(newEnumerator, 200, res);
+      } catch (error) {
+        res.status(500).json({ error });
+      }
+    }
+  } catch (error) {
+    res.status(500).json(error.message);
   }
 });
 
@@ -267,10 +273,17 @@ export const logoutUser = catchAsyncErrors(async (req, res, next) => {
 // Get all users => api/v1/admin/users ****
 export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
   const users = await User.find();
-  res.status(200).json({
-    success: true,
-    users,
-  });
+  if (users) {
+    // return next(new ErrorHandler("hello my nigga", 400));
+    res.status(400).json({
+      success: false,
+      message: "error",
+    });
+  }
+  // res.status(200).json({
+  //   success: true,
+  //   users,
+  // });
 });
 
 // Get specific user => api/v1/admin/users/:id ****
@@ -318,15 +331,18 @@ export const updateUserProfileAdmin = catchAsyncErrors(
 
 // Disable enumerator ADMIN => api/v1/admin/enumerator/:id/disable ****
 export const disableEnumerator = catchAsyncErrors(async (req, res, next) => {
-  
-  const enumerator = await Enumerator.findByIdAndUpdate(req.params.id, { disabled: true }, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
+  const enumerator = await Enumerator.findByIdAndUpdate(
+    req.params.id,
+    { disabled: true },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
 
-  if(!enumerator){
-    return next(new ErrorHandler(`User with id ${req.params.id} not found`))
+  if (!enumerator) {
+    return next(new ErrorHandler(`User with id ${req.params.id} not found`));
   }
 
   res.status(200).json({
@@ -335,18 +351,20 @@ export const disableEnumerator = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 // Disable user ADMIN => api/v1/admin/enumerator/:id/disable ****
 export const disableUser = catchAsyncErrors(async (req, res, next) => {
-  
-  const user = await User.findByIdAndUpdate(req.params.id, { disabled: true }, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    { disabled: true },
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
 
-  if(!user){
-    return next(new ErrorHandler(`User with id ${req.params.id} not found`))
+  if (!user) {
+    return next(new ErrorHandler(`User with id ${req.params.id} not found`));
   }
 
   res.status(200).json({
@@ -355,13 +373,27 @@ export const disableUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-export const seed = catchAsyncErrors(async (req, res) => {
+// Seed super admin => api/v1/seed
+export const seedSuperAdmin = catchAsyncErrors(async (req, res, next) => {
   try {
-    const { firstName, lastName, password, email, state, LGA, role } = req.body;
-    const user = await User.create({ firstName, lastName, email, state, username, password, LGA, role });
-    res.status(201).json({ message: 'Super admin created successfully!', user });
+    const { firstName, lastName, password, email } = req.body;
+    const user = await User.create({
+      firstName,
+      lastName,
+      email,
+      password,
+      role: "super_admin",
+    });
+    sendToken(user, 200, res);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(400).json({
+      message: error.message,
+    });
   }
+
+  // if (!user) {
+  //   return next(new ErrorHandler("Something went wrong", 400));
+  // }
+
+  //
 });

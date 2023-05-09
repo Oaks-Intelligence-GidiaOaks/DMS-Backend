@@ -1,6 +1,6 @@
 import Enumerator from "../models/enumeratorModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
-import ErrorHandler from "../utils/errorHandler";
+import ErrorHandler from "../utils/errorHandler.js";
 
 // Login enumerator api/v1/enumerator/login ****
 export const loginEnumerator = catchAsyncErrors(async (req, res, next) => {

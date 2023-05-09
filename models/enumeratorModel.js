@@ -41,6 +41,7 @@ const EnumeratorSchema = new Schema({
   id: {
     type: String,
     required: true,
+    unique: true,
   },
   state: {
     type: String,

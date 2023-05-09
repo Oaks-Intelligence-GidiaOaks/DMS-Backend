@@ -31,7 +31,6 @@ const userSchema = new Schema({
   },
   state: {
     type: String,
-    required: true,
   },
   disabled: {
     type: Boolean,
@@ -44,7 +43,6 @@ const userSchema = new Schema({
   LGA: [
     {
       type: String,
-      required: true,
     },
   ],
   enumerators: [

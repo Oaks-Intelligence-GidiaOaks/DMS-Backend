@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import { connectDb } from "./configs/connectDb.js";
 import userRoute from "./routes/userRoutes.js"
+import enumeratorRoute from "./routes/enumeratorRoutes.js"
 
 // env config
 dotenv.config({
@@ -30,7 +31,7 @@ process.on("unhandledRejection", (err) => {
 });
 
 // port/environment
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 const ENV = process.env.ENV;
 
 
@@ -44,7 +45,8 @@ app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 // routes
-app.use("api/v1/", userRoute)
+app.use("/api/v1/", userRoute)
+app.use("/api/v1/", enumeratorRoute)
 
 // Error handling middleware
 app.use(errorMiddleWare);
