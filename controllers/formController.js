@@ -10,7 +10,10 @@ import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
 // add form response data api/v1/form/add_data
-export const addFormData = catchAsyncErrors(async (req, res, next) => {
+// export const addFormData = catchAsyncErrors(async (req, res, next) => {
+export const addFormData = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     const {
       foodItems,
@@ -19,12 +22,9 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
       electricity,
       questions,
       others,
+      lga,
     } = req.body;
     // validate here
-    console.log(req.enumerator);
-
-    const session = await mongoose.startSession();
-    session.startTransaction();
 
     // food items
     let food_ids = await Promise.all(
@@ -33,6 +33,10 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
 
         let newProduct = await new Product({
           created_by: req.enumerator._id,
+          region: req.enumerator?.region,
+          state: req.enumerator.state,
+          team_lead_id: req.enumerator.user,
+          lga: lga ? lga : req.enumerator.LGA[0],
           name,
           price,
           brand,
@@ -45,27 +49,46 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
     // questions
     let questions_ids = await Promise.all(
       questions.map(async (item, index) => {
-        const { question, response, comment } = item;
+        const {
+          government_project,
+          comment_for_government_project,
+          crime_report,
+          comment_for_crime_report,
+          accidents,
+          comment_for_accidents,
+        } = item;
 
         let newQuestion = await new Question({
           created_by: req.enumerator._id,
-          question,
-          response,
-          comment,
+          region: req.enumerator?.region,
+          state: req.enumerator.state,
+          team_lead_id: req.enumerator.user,
+          lga: lga ? lga : req.enumerator.LGA[0],
+          government_project,
+          comment_for_government_project,
+          crime_report,
+          comment_for_crime_report,
+          accidents,
+          comment_for_accidents,
         }).save();
         return newQuestion._id;
       })
     );
 
-    //   accomodations
+    //  accomodations
     let accomodation_ids = await Promise.all(
       accomodations.map(async (item, index) => {
-        const { type, price } = item;
+        const { type, price, rooms } = item;
 
         let newAccomodation = await new Accomodation({
           created_by: req.enumerator._id,
+          created_by: req.enumerator._id,
+          region: req.enumerator?.region,
+          state: req.enumerator.state,
+          team_lead_id: req.enumerator.user,
+          lga: lga ? lga : req.enumerator.LGA[0],
           type,
-          // rooms,
+          rooms,
           price,
         }).save();
         return newAccomodation._id;
@@ -78,6 +101,10 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
 
         let newElectricty = await new Electricity({
           created_by: req.enumerator._id,
+          region: req.enumerator?.region,
+          state: req.enumerator.state,
+          team_lead_id: req.enumerator.user,
+          lga: lga ? lga : req.enumerator.LGA[0],
           hours_per_week,
         }).save();
         return newElectricty._id;
@@ -87,12 +114,15 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
     //   transports
     let transport_ids = await Promise.all(
       transports.map(async (item, index) => {
-        const { start, end, mode, cost } = item;
+        const { route, mode, cost } = item;
 
         let newTransport = await new Transport({
           created_by: req.enumerator._id,
-          start,
-          end,
+          region: req.enumerator?.region,
+          state: req.enumerator.state,
+          team_lead_id: req.enumerator.user,
+          lga: lga ? lga : req.enumerator.LGA[0],
+          route,
           mode,
           cost,
         }).save();
@@ -107,6 +137,10 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
 
         let newOtherProduct = await new OtherProduct({
           created_by: req.enumerator._id,
+          region: req.enumerator?.region,
+          state: req.enumerator.state,
+          team_lead_id: req.enumerator.user,
+          lga: lga ? lga : req.enumerator.LGA[0],
           name,
           price,
           brand,
@@ -119,6 +153,10 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
     // parent entry
     const newEntry = await new Form({
       created_by: req.enumerator._id,
+      region: req.enumerator?.region,
+      state: req.enumerator.state,
+      team_lead_id: req.enumerator.user,
+      lga: lga ? lga : req.enumerator.LGA[0],
       foodItems: food_ids,
       accomodations: accomodation_ids,
       transports: transport_ids,
@@ -142,22 +180,12 @@ export const addFormData = catchAsyncErrors(async (req, res, next) => {
     // Ending the session
     session.endSession();
   }
-});
+};
 
 // get all form data api/v1/form/form_data
 export const getFormData = catchAsyncErrors(async (req, res, next) => {
   try {
-    const data = await Form.find()
-      .populate("created_by")
-      .populate("foodItems")
-      .populate("accomodations")
-      .populate("transports")
-      .populate("questions");
-
-    const filteredList = data.filter((item) => {
-      item.user == req.user._id;
-    });
-
+    const data = await Form.find();
     res.status(200).json({ data });
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));

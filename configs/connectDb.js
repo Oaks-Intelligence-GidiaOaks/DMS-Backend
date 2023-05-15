@@ -4,9 +4,8 @@ dotenv.config({
   path: "backend/configs/config.env",
 });
 
+mongoose.set("strictQuery", false);
 
-mongoose.set('strictQuery', false);
- 
 export const connectDb = (URI) => {
   try {
     mongoose.connect(URI);
@@ -14,5 +13,5 @@ export const connectDb = (URI) => {
   } catch (err) {
     console.log("Data base connection failed");
   }
-  return {}
+  return {};
 };

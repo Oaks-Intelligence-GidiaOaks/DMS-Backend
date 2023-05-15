@@ -30,14 +30,12 @@
     ],
     "transports": [
         {
-            "start": "ikeja",
-            "end": "ikorodu",
+            "route": "ikorodu to ikeja",
             "mode": "Uber",
             "cost": 5000
         },
         {
-            "start": "abuja",
-            "end": "lagos",
+            "route": "ikorodu to vi",
             "mode": "Public",
             "cost": 50000
         }
@@ -45,10 +43,12 @@
     "accomodations": [
         {
             "type": "duplex",
+            "rooms": 2,
             "price": 500000
         },
         {
             "type": "self Contain",
+            "rooms": 1,
             "price": 150000
         }
     ],
@@ -59,13 +59,14 @@
     ],
     "questions": [
         {
-            "question": "Was there Issues in Your Community",
-            "response": true,
-            "comment": "everybody ran away"
+            "government_project": true,
+            "comment_for_government_project": "everybody ran away"
         },
         {
-             "question": "Was there Light in Your Community",
-            "response": false
+             "crime_report": false
+        },
+        {
+             "accidents": false
         }
     ]
 }

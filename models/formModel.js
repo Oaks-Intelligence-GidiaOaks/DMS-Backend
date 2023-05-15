@@ -8,6 +8,11 @@ const FormSchema = new Schema({
     ref: "Enumerator",
     required: true,
   },
+  state: { type: String, required: true },
+  lga: { type: String, required: true },
+  region: { type: String },
+  approved: { type: Number, default: 0 },
+  team_lead_id: { type: String, required: true },
   foodItems: [
     {
       type: mongoose.Schema.Types.ObjectId,
