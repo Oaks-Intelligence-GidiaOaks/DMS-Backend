@@ -6,28 +6,23 @@ import sendToken from "../utils/sendToken.js";
 // Login enumerator api/v1/enumerator/login ****
 export const loginEnumerator = catchAsyncErrors(async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { id, password } = req.body;
 
-    if (!password || !email) {
+    if (!password || !id) {
       res.status(401).json({
-        message: "Please provide a password and email address",
+        message: "Please provide a password and id",
       });
-      // return next(
-      //   new ErrorHandler("Please provide a password and email address", 400)
-      // );
     }
 
     // find user in database
-    const enumerator = await Enumerator.findOne({ email }).select("+password");
+    const enumerator = await Enumerator.findOne({ id }).select("+password");
 
     // check if user exist in db
     if (!enumerator) {
       res.status(401).json({
-        message: "Invalid email or password, please try again",
+        success: false,
+        message: "Invalid id or password, please try again",
       });
-      // return next(
-      //   new ErrorHandler("Invalid email or password, please try again", 401)
-      // );
     }
 
     if (enumerator.disabled) {
@@ -35,10 +30,6 @@ export const loginEnumerator = catchAsyncErrors(async (req, res, next) => {
         message:
           "Your account has been disabled. Please contact the administrator for assistance",
       });
-      // new ErrorHandler(
-      //   "Your account has been disabled. Please contact the administrator for assistance",
-      //   401
-      // );
     }
 
     const passwordMatch = enumerator.isPasswordMatch(password);
@@ -46,18 +37,15 @@ export const loginEnumerator = catchAsyncErrors(async (req, res, next) => {
     if (enumerator && passwordMatch) {
       sendToken(enumerator, 200, res);
     } else {
-      //  res.status(401);
       res
         .status(401)
         .json({ message: "Invalid email or password, please try again" });
-      //  return next(
-      //    new ErrorHandler("Invalid email or password, please try again", 401)
-      //  );
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message, stack: error.stack });
   }
 });
+
 
 // Get currently logged in enumerator profile => api/v1/me ****
 export const getEnumeratorProfile = catchAsyncErrors(async (req, res, next) => {

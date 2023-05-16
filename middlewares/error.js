@@ -13,7 +13,7 @@ export default (err, req, res, next) => {
   }
 
   if (process.env.NODE_ENV === "PRODUCTION") {
-    let error = { ...err };
+    let error = {...err};
     error.message = err.message;
 
     // Handling wrong mongoose Id Error
@@ -23,27 +23,25 @@ export default (err, req, res, next) => {
     }
 
     // Handling mongooose validation error
-    if (err.name === "ValidationError") {
-      const message = Object.values(err.errors).map((value) => value.message);
+    if(err.name === "ValidationError") {
+      const message = Object.values(err.errors).map(value => value.message);
       error = new ErrorHandler(message, 400);
     }
 
     // Handling mongoose duplicate key error
-    if (err.code === 11000) {
-      const message = `Duplicate values for ${Object.keys(
-        err.keyValue
-      )} entered`;
+    if(err.code === 11000){
+      const message = `Duplicate values for ${Object.keys(err.keyValue)} entered`
       error = new ErrorHandler(message, 400);
     }
 
     // Handling wrong Jwt error
-    if (err.name === "JsonWebTokenError") {
+    if(err.name === "JsonWebTokenError") {
       const message = "JSON Web Token is invalid, please try again!";
       error = new ErrorHandler(message, 400);
     }
 
     // Handling expired Jwt error
-    if (err.name === "TokenExpiredError") {
+    if(err.name === "TokenExpiredError") {
       const message = "JSON Web Token is expired, please try again!";
       error = new ErrorHandler(message, 400);
     }

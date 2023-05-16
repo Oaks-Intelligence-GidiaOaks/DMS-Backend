@@ -1,7 +1,8 @@
 // A function that returns a generated password of specific length
 
-function generatePassword(length = 12) {
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+function generatePassword(length = 8) {
+    // const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+    const charset = "0123456789";
     let password = "";
 
     // Add random characters to the password string

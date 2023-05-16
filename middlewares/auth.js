@@ -8,9 +8,8 @@ import catchAsyncErrors from "./catchAsyncError.js";
 export const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.cookies;
   if (!token) {
-    return next(
-      new ErrorHandler("Please log in to access this resource.", 401)
-    );
+    res.status(401).json({ message: "Please log in to access this resource."})
+
   }
   const decoded = Jwt.verify(token, process.env.JWT_SECRET);
   req.user = await User.findById(decoded.id);
@@ -21,9 +20,7 @@ export const isAuthenticatedEnumerator = catchAsyncErrors(
   async (req, res, next) => {
     const { token } = req.cookies;
     if (!token) {
-      return next(
-        new ErrorHandler("Please log in to access this resource.", 401)
-      );
+      res.status(401).json({ message: "Please log in to access this resource."})
     }
     const decoded = Jwt.verify(token, process.env.JWT_SECRET);
     req.enumerator = await Enumerator.findById(decoded.id);
@@ -35,12 +32,7 @@ export const isAuthenticatedEnumerator = catchAsyncErrors(
 export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return next(
-        new ErrorHandler(
-          `${req.user.role} is not authorized to access this resource`,
-          403
-        )
-      );
+      res.status(403).json({ message: `${req.user.role} is not authorized to access this resource`})
     }
     next();
   };

@@ -28,7 +28,6 @@
     "moment": "^2.29.4",
     "mongoose": "^6.8.4",
     "nodemailer": "^6.9.1",
-    "react-js-pagination": "^3.0.3",
     "validator": "^13.9.0"
   },
   "bugs": {

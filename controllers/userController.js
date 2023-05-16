@@ -3,135 +3,199 @@ import Enumerator from "../models/enumeratorModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import sendToken from "../utils/sendToken.js";
-import generatePassword from "../utils/generatePassword.js";
+import generateId from "../utils/generateId.js";
 import sendEmail from "../utils/sendEmail.js";
-
+import error from "../middlewares/error.js";
+import { request } from "express";
 
 // Create team lead/admin api/v1/user/new ****
 export const createUser = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, email, state, LGA } = req.body;
-  const user = await User.findOne({ email });
+  try {
+    const { firstName, lastName, email, role, state, LGA } = req.body;
+    const user = await User.findOne({ email });
 
-  if (user) {
-    return next(new ErrorHandler("User already exists", 409));
-  }
-
-  // const password = generatePassword();
-  console.log(password, "** pass test hash check");
-
-  const newUser = await User.create({
-    firstName,
-    lastName,
-    email,
-    password: "123456",
-    state,
-    LGA,
-  });
-
-  sendToken(newUser, 200, res);
-
-  // send password to user email address
-  if (newUser) {
-    try {
-      sendEmail({
-        email,
-        subject: "Gidiaoks DCF Password",
-        message: `Please sign in to DCF with this password: ${password}. Cheers!`,
+    if (user) {
+      res.status(400).json({
+        message: "User already exists",
       });
-    } catch (error) {
-      return next(new ErrorHandler(error.message, 500));
     }
+
+    // get all users, map ids into list
+    const users = await User.find({});
+    const userIds = users.map((user) => user.id);
+
+    // Generate a new id until it is unique
+    const id = generateId();
+    while (userIds.includes(id)) {
+      // Assign a new value to id here
+      id = generateId();
+    }
+
+    const newUser = await User.create({
+      id,
+      firstName,
+      lastName,
+      email,
+      role,
+      password: "123456",
+      state,
+      LGA,
+    });
+
+    // send password to user email address
+    if (newUser) {
+      try {
+        sendEmail({
+          email,
+          subject: "Gidiaoks DCF Password",
+          message: `Please sign in to DCF with this password: ${id}. Cheers!`,
+        });
+      } catch (error) {
+        res.status(400).json({
+          message: error.message,
+        });
+      }
+    }
+
+    // sendToken(newUser, 200, res);
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+      stack: error.stack,
+    });
   }
 });
 
 // Create team lead/admin api/v1/enumerator/new ****
 export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
   try {
-    const { firstName, lastName, email, phoneNumber, id, state, LGA } =
-      req.body;
-
-    console.log(req, "****id");
+    const {
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      identityType,
+      identity,
+      state,
+      LGA,
+    } = req.body;
 
     const enumerator = await Enumerator.findOne({ email });
 
     if (enumerator) {
-      // return next(new ErrorHandler("Enumerator already exists", 409));
       res.status(409).json({
         success: false,
         message: `Enumerator already exists`,
-      })
+      });
     }
 
-    // Generate enumerator password
-    const password = generatePassword();
+    // get all enumerators, map ids into list
+    const enumerators = await Enumerator.find({});
+    const enumeratorsIds = enumerators.map((enumerator) => enumerator.id);
+
+    // Generate a new id until it is unique
+    const id = generateId();
+    while (enumeratorsIds.includes(id)) {
+      // Assign a new value to id here
+      id = generateId();
+    }
 
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
       firstName,
       lastName,
       email,
-      password,
-      phoneNumber,
       id,
+      password: "123456",
+      phoneNumber,
+      identityType,
+      identity,
       state,
       LGA,
       user: req.user._id,
     });
 
     // send password to user email address
-    if (newEnumerator) {
-      try {
-        sendEmail({
-          email,
-          subject: "Gidiaoks DCF Password",
-          message: `Please sign in to DCF with this password: ${password}. Please note that password expires after 7 days`,
-        });
-        sendToken(newEnumerator, 200, res);
-      } catch (error) {
-        res.status(500).json({ error });
-      }
-    }
+    // if (newEnumerator) {
+    //   try {
+    //     sendEmail({
+    //       email,
+    //       subject: "Gidiaoks DCF Password",
+    //       message: `Please sign in to DCF with this password: ${password}. Please note that password expires after 7 days`,
+    //     });
+    //   } catch (error) {
+    //     res.status(500).json({ error });
+    //   }
+    // }
+    // sendToken(newEnumerator, 200, res);
+    res.status(200).json({
+      success: true,
+      enumerator,
+    });
   } catch (error) {
+    // res.status(500).json({ message: error.message, stack: error.stack });
     res.status(500).json(error.message);
   }
 });
 
 // Login user api/v1/login ****
 export const loginUser = catchAsyncErrors(async (req, res, next) => {
-  const { email, password } = req.body;
+  try {
+    const { id, password } = req.body;
 
-  if (!password || !email) {
-    return next(
-      new ErrorHandler("Please provide a password and email address", 400)
-    );
-  }
+    if (!password || !id) {
+      res.status(400).json({
+        message: "Please provide a password and id",
+      });
+    }
 
-  // find user in database
-  const user = await User.findOne({ email }).select("+password");
+    // find user in database
+    const user = await User.findOne({ id }).select("+password");
 
-  // check if user exist in db
-  if (!user) {
-    return next(
-      new ErrorHandler("Invalid email or password, please try again", 401)
-    );
-  }
+    if (user) {
+      // return eror if user/enumerator dont exist in db
+      if (!user) {
+        res.status(401).json({
+          message: "Invalid Id or password, please try again",
+        });
+      }
 
-  if (user.disabled) {
-    new ErrorHandler(
-      "Your account has been disabled. Please contact the administrator for assistance",
-      401
-    );
-  }
+      if (user.disabled) {
+        res.status(401).json({
+          message:
+            "Your account has been disabled. Please contact the administrator for assistance",
+        });
+      }
 
-  const passwordMatch = user.isPasswordMatch(password);
+      const passwordMatch = user.isPasswordMatch(password);
 
-  if (user && passwordMatch) {
-    sendToken(user, 200, res);
-  } else {
-    res.status(401);
-    return next(
-      new ErrorHandler("Invalid email or password, please try again", 401)
-    );
+      passwordMatch && sendToken(user, 200, res);
+    } else {
+      const enumerator = await Enumerator.findOne({ id }).select("+password");
+
+      if (!enumerator) {
+        res.status(401).json({
+          message: "Invalid Id or password, please try again",
+        });
+      }
+
+      if (enumerator.disabled) {
+        res.status(401).json({
+          message:
+            "Your account has been disabled. Please contact the administrator for assistance",
+        });
+      }
+
+      const passwordMatch = enumerator.isPasswordMatch(password);
+
+      passwordMatch && sendToken(enumerator, 200, res);
+    }
+  } catch (error) {
+    res.status(401).json({ message: error.message, stack: error.stack });
   }
 });
 
@@ -141,6 +205,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
   if (!user) {
     next(new ErrorHandler("Email not found", 404));
+    res.status(404).json({ message: "User not found" });
   }
 
   // Get reset password token
@@ -157,7 +222,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   try {
     await sendEmail({
       email: user.email,
-      subject: "ShopNow Password Reset",
+      subject: "DMS Password Reset",
       message,
     });
 
@@ -171,8 +236,7 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
     // save user again
     await user.save({ validateBeforeSave: false });
-
-    return next(new ErrorHandler(error.message, 500));
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -278,7 +342,7 @@ export const logoutUser = catchAsyncErrors(async (req, res, next) => {
 // Get all users => api/v1/admin/users ****
 export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
   const users = await User.find();
-  
+
   res.status(200).json({
     success: true,
     users,
@@ -294,7 +358,6 @@ export const getAllEnumerators = catchAsyncErrors(async (req, res, next) => {
     enumerators,
   });
 });
-
 
 // Get specific user => api/v1/admin/users/:id ****
 export const getOneUser = catchAsyncErrors(async (req, res, next) => {
@@ -387,7 +450,10 @@ export const disableUser = catchAsyncErrors(async (req, res, next) => {
 export const seedSuperAdmin = catchAsyncErrors(async (req, res, next) => {
   try {
     const { firstName, lastName, password, email } = req.body;
+    const id = generateId();
+
     const user = await User.create({
+      id,
       firstName,
       lastName,
       email,
@@ -398,6 +464,7 @@ export const seedSuperAdmin = catchAsyncErrors(async (req, res, next) => {
   } catch (error) {
     res.status(400).json({
       message: error.message,
+      stack: error.stack,
     });
   }
 

@@ -24,24 +24,33 @@ const EnumeratorSchema = new Schema({
     unique: true,
     validate: [validator.isEmail, "Please enter a valid email"],
   },
+  id: {
+    type: String,
+    required: [true, "please enter your id"],
+    unique: true,
+  },
   password: {
     type: String,
     required: true,
     minlenght: [6, "Password must be at least 6 characters"],
     select: false,
   },
-  passwordExpiresAt: {
-    type: Date,
-    default: () => moment().add(7, 'days')
-  },
   phoneNumber: {
     type: String,
     required: true,
   },
-  id: {
+  identityType: {
+    type: String,
+    enum: ["NIN", "Passport", "Voters Card", "Drivers license"],
+  },
+  identity: {
     type: String,
     required: true,
     unique: true,
+  },
+  role: {
+    type: String,
+    default: "enumerator",
   },
   state: {
     type: String,
