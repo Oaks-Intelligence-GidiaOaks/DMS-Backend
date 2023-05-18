@@ -3,6 +3,9 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cloudinary from "cloudinary";
+import {google} from "googleapis";
+import fileUpload from "express-fileupload";
 import errorMiddleWare from "./middlewares/error.js";
 import { connectDb } from "./configs/connectDb.js";
 import formRoutes from "./routes/formRoutes.js";
@@ -49,6 +52,21 @@ const corsOptions = {
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(fileUpload())
+
+// Setting up cloudinary configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+});
+
+const oauth2Client = new google.auth.OAuth2(
+  process.env.MY_CLIENT_SECRET,
+  process.env.MY_REDIRECT_URL
+);
+
+
 
 // routes
 app.use("/api/v1/form", formRoutes);

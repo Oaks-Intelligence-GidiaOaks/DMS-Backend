@@ -3,7 +3,7 @@ import Enumerator from "../models/enumeratorModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import sendToken from "../utils/sendToken.js";
-import generateId from "../utils/generateId.js";
+import { generateId, generatePassword } from "../utils/generateId.js";
 import sendEmail from "../utils/sendEmail.js";
 import error from "../middlewares/error.js";
 import { request } from "express";
@@ -31,6 +31,15 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
       id = generateId();
     }
 
+    const resultUserAvarter = await cloudinary.v2.uploader.upload(
+      req.body.avarter,
+      {
+        folder: "avarters",
+        width: 150,
+        crop: "scale",
+      }
+    );
+
     const newUser = await User.create({
       id,
       firstName,
@@ -38,6 +47,10 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
       email,
       role,
       password: "123456",
+      // avarter: {
+      //   public_id: resultUserAvarter.public_id,
+      //   url: resultUserAvarter.secure_url
+      // },
       state,
       LGA,
     });
@@ -70,7 +83,7 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-// Create team lead/admin api/v1/enumerator/new ****
+// Create enumerator lead/admin api/v1/enumerator/new ****
 export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
   try {
     const {
@@ -104,37 +117,55 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
       id = generateId();
     }
 
+    // Generate a new password
+    const password = generatePassword();
+    console.log(password, "**pass");
+
+    // const resultUserAvarter = await cloudinary.v2.uploader.upload(
+    //   req.body.avarter,
+    //   {
+    //     folder: "avarters",
+    //     width: 150,
+    //     crop: "scale",
+    //   }
+    // );
+
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
       firstName,
       lastName,
       email,
       id,
-      password: "123456",
+      password,
       phoneNumber,
       identityType,
       identity,
+      // avarter: {
+      //   public_id: resultUserAvarter.public_id,
+      //   url: resultUserAvarter.secure_url
+      // },
       state,
       LGA,
       user: req.user._id,
     });
 
     // send password to user email address
-    // if (newEnumerator) {
-    //   try {
-    //     sendEmail({
-    //       email,
-    //       subject: "Gidiaoks DCF Password",
-    //       message: `Please sign in to DCF with this password: ${password}. Please note that password expires after 7 days`,
-    //     });
-    //   } catch (error) {
-    //     res.status(500).json({ error });
-    //   }
-    // }
+    if (newEnumerator) {
+      try {
+        sendEmail({
+          email,
+          subject: "Gidiaoks DCF Password",
+          message: `Please sign in to DCF with this password: ${password}. Cheers!`,
+        });
+      } catch (error) {
+        res.status(500).json({ error });
+      }
+    }
     // sendToken(newEnumerator, 200, res);
+
     res.status(200).json({
       success: true,
-      enumerator,
+      newEnumerator,
     });
   } catch (error) {
     // res.status(500).json({ message: error.message, stack: error.stack });
@@ -204,7 +235,6 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    next(new ErrorHandler("Email not found", 404));
     res.status(404).json({ message: "User not found" });
   }
 
