@@ -48,6 +48,14 @@ const EnumeratorSchema = new Schema({
     required: true,
     unique: true,
   },
+  identityImage: {
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+  },
   role: {
     type: String,
     default: "enumerator",
@@ -71,6 +79,8 @@ const EnumeratorSchema = new Schema({
     ref: "User",
     required: true,
   },
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
 });
 
 EnumeratorSchema.pre("save", async function (next) {

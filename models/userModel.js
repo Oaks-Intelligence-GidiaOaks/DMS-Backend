@@ -34,6 +34,14 @@ const userSchema = new Schema({
     minlenght: [6, "Password must be at least 6 characters"],
     select: false,
   },
+  avarter: {
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+  },
   state: {
     type: String,
   },
@@ -96,5 +104,3 @@ userSchema.methods.getResetPasswordToken = function () {
 };
 
 export default model("User", userSchema);
-
-
