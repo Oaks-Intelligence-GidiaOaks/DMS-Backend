@@ -9,6 +9,7 @@ import formRoutes from "./routes/formRoutes.js";
 import formResponseRoutes from "./routes/formResponseRoute.js";
 import userRoute from "./routes/userRoutes.js";
 import enumeratorRoute from "./routes/enumeratorRoutes.js";
+import lgaRoutes from "./routes/lgaRoutes.js";
 
 // env config
 dotenv.config({
@@ -55,6 +56,7 @@ app.use("/api/v1/form", formRoutes);
 app.use("/api/v1/form_response", formResponseRoutes);
 app.use("/api/v1/", userRoute);
 app.use("/api/v1/", enumeratorRoute);
+app.use("/api/v1/", lgaRoutes);
 
 // Error handling middleware
 app.use(errorMiddleWare);
