@@ -19,10 +19,15 @@ export const getResponseTracker = catchAsyncErrors(async (req, res, next) => {
   }
   query.created_at = { $gte: getLastWeeksDate() };
 
-  const currentPage = page || 1;
-  const skip = (currentPage - 1) * 10;
+  // const currentPage = page || 1;
+  // const skip = (currentPage - 1) * 10;
   try {
     let enumeratorIds;
+    let results;
+    const totalSubmision = await Form.countDocuments(query);
+    const totalEnumerators = await Enumerator.countDocuments({
+      user: req.user._id,
+    });
     const enumerators = await Enumerator.find({ user: req.user._id }).exec(
       (err, enumerators) => {
         if (err) {
@@ -42,32 +47,35 @@ export const getResponseTracker = catchAsyncErrors(async (req, res, next) => {
               // Create a map of enumeratorId to response for easier lookup
               const responseMap = new Map();
               data.forEach((response) => {
-                responseMap.set(response.created_by.toString());
+                responseMap.set(response.created_by.toString(), response);
               });
+              // Iterate through the enmerators and determine the status
+              results = enumerators.map((enumerator) => {
+                const response = responseMap.get(enumerator._id.toString());
+                const status = !!response;
+                const state = response ? response.state : null;
+                const lga = response ? response.lga : null;
+                const created_at = response ? response.created_at : null;
 
-              // Iterate through the applicants and determine the status
-              const results = enumerators.map((enumerator) => {
-                const status = responseMap.has(enumerator._id.toString());
-                return { name: enumerator.firstName, status };
+                return {
+                  first_name: enumerator.firstName,
+                  last_name: enumerator.lastName,
+                  state,
+                  lga,
+                  created_at,
+                  status,
+                };
               });
-
-              console.log(results);
-              // Handle the results or return them as needed
+              res
+                .status(200)
+                .json({ results, totalEnumerators, totalSubmision });
             }
           });
-
-          res.status(200).json({ enumerators, enumeratorIds, data });
         }
       }
     );
 
-    const totalCount = await Form.countDocuments(query);
-    const data = await Form.find(query)
-      .populate("created_by")
-      .skip(skip)
-      .limit(10);
-
-    res.status(200).json({ data, totalCount });
+    // res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });

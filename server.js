@@ -4,7 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import cloudinary from "cloudinary";
-import {google} from "googleapis";
+import { google } from "googleapis";
 import fileUpload from "express-fileupload";
 import errorMiddleWare from "./middlewares/error.js";
 import { connectDb } from "./configs/connectDb.js";
@@ -13,6 +13,7 @@ import formResponseRoutes from "./routes/formResponseRoute.js";
 import userRoute from "./routes/userRoutes.js";
 import enumeratorRoute from "./routes/enumeratorRoutes.js";
 import lgaRoutes from "./routes/lgaRoutes.js";
+import teamLeadDashboardRoutes from "./routes/teamLeadDashboardRoute.js";
 
 // env config
 dotenv.config({
@@ -53,7 +54,7 @@ const corsOptions = {
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors(corsOptions));
-app.use(fileUpload())
+app.use(fileUpload());
 
 // Setting up cloudinary configuration
 cloudinary.config({
@@ -67,14 +68,13 @@ const oauth2Client = new google.auth.OAuth2(
   process.env.MY_REDIRECT_URL
 );
 
-
-
 // routes
 app.use("/api/v1/form", formRoutes);
 app.use("/api/v1/form_response", formResponseRoutes);
 app.use("/api/v1/", userRoute);
 app.use("/api/v1/", enumeratorRoute);
 app.use("/api/v1/", lgaRoutes);
+app.use("/api/v1/team_lead_dashboard", teamLeadDashboardRoutes);
 
 // Error handling middleware
 app.use(errorMiddleWare);
