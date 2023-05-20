@@ -133,7 +133,6 @@ export const getTransport = catchAsyncErrors(async (req, res, next) => {
     query.team_lead_id = req.user._id;
   }
   query.created_at = { $gte: getLastWeeksDate() };
-
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
   try {
@@ -155,7 +154,7 @@ export const updateTransport = async (req, res) => {
   try {
     const { id } = req.params;
     const { route, mode, cost } = req.body;
-    await Product.findByIdAndUpdate(
+    await Transport.findByIdAndUpdate(
       { _id: id },
       {
         route,
@@ -232,7 +231,7 @@ export const updateAccomodation = async (req, res) => {
   try {
     const { id } = req.params;
     const { type, price, rooms } = req.body;
-    await Product.findByIdAndUpdate(
+    await Accomodation.findByIdAndUpdate(
       { _id: id },
       {
         type,
@@ -301,7 +300,7 @@ export const updateElectricity = async (req, res) => {
   try {
     const { id } = req.params;
     const { hours_per_week } = req.body;
-    await Product.findByIdAndUpdate(
+    await Electricity.findByIdAndUpdate(
       { _id: id },
       {
         hours_per_week,
@@ -384,7 +383,7 @@ export const updateQuestions = async (req, res) => {
       comment_for_accidents,
       note,
     } = req.body;
-    await Product.findByIdAndUpdate(
+    await Question.findByIdAndUpdate(
       { _id: id },
       {
         government_project,
@@ -465,7 +464,7 @@ export const updateOtherProducts = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price, brand } = req.body;
-    await Product.findByIdAndUpdate(
+    await OtherProduct.findByIdAndUpdate(
       { _id: id },
       {
         name,

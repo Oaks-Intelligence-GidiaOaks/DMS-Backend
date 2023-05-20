@@ -5,6 +5,7 @@ dotenv.config({
 });
 
 mongoose.set("strictQuery", false);
+mongoose.set("strictPopulate", false);
 
 export const connectDb = (URI) => {
   try {

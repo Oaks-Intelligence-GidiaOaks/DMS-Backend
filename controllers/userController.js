@@ -149,6 +149,10 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
       user: req.user._id,
     });
 
+    const user = await User.findById(req.user._id);
+    user.enumerators.push(newEnumerator._id);
+    await user.save();
+
     // send password to user email address
     if (newEnumerator) {
       try {

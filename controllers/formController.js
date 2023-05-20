@@ -56,6 +56,7 @@ export const addFormData = async (req, res) => {
           comment_for_crime_report,
           accidents,
           comment_for_accidents,
+          note,
         } = item;
 
         let newQuestion = await new Question({
@@ -70,6 +71,7 @@ export const addFormData = async (req, res) => {
           comment_for_crime_report,
           accidents,
           comment_for_accidents,
+          note,
         }).save();
         return newQuestion._id;
       })

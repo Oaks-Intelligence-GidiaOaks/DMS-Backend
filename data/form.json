@@ -60,13 +60,9 @@
     "questions": [
         {
             "government_project": true,
-            "comment_for_government_project": "everybody ran away"
-        },
-        {
-             "crime_report": false
-        },
-        {
-             "accidents": false
+            "comment_for_government_project": "everybody ran away",
+            "crime_report": false,
+            "accidents": false
         }
     ]
 }
