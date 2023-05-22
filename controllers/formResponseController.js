@@ -9,12 +9,13 @@ import Question from "../models/questionModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import APIQueries from "../utils/apiQueries.js";
+import "../utils/dateUtils.js";
 
-function getLastWeeksDate() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
-}
-
+// function getLastWeeksDate() {
+//   const now = new Date();
+//   return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+// }
+const currentWeek = new Date().getWeek();
 // get food product api/v1/form_response/food_product
 export const getFoodProduct = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -28,32 +29,44 @@ export const getFoodProduct = catchAsyncErrors(async (req, res, next) => {
     page,
   } = req.query;
 
-  const query = {};
+  const additionalQueryParams = {};
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (stateFilter !== "") {
-    query.state = stateFilter;
+    additionalQueryParams.state = stateFilter;
   }
   if (lgaFilter !== "") {
-    query.lga = lgaFilter;
+    additionalQueryParams.lga = lgaFilter;
   }
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (nameFilter !== "") {
-    query.name = nameFilter;
+    additionalQueryParams.name = nameFilter;
   }
   if (brandFilter !== "") {
-    query.brand = brandFilter;
+    additionalQueryParams.brand = brandFilter;
   }
   if (priceFilter !== "") {
-    query.price = priceFilter;
+    additionalQueryParams.price = priceFilter;
   }
   if (req?.user?.role === "team_lead") {
-    query.team_lead_id = req.user._id;
+    additionalQueryParams.team_lead_id = req.user._id;
   }
-  query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
 
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
@@ -107,32 +120,45 @@ export const getTransport = catchAsyncErrors(async (req, res, next) => {
     page,
   } = req.query;
 
-  const query = {};
+  const additionalQueryParams = {};
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (stateFilter !== "") {
-    query.state = stateFilter;
+    additionalQueryParams.state = stateFilter;
   }
   if (lgaFilter !== "") {
-    query.lga = lgaFilter;
+    additionalQueryParams.lga = lgaFilter;
   }
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (routeFilter !== "") {
-    query.route = routeFilter;
+    additionalQueryParams.route = routeFilter;
   }
   if (modeFilter !== "") {
-    query.mode = modeFilter;
+    additionalQueryParams.mode = modeFilter;
   }
   if (costFilter !== "") {
-    query.cost = costFilter;
+    additionalQueryParams.cost = costFilter;
   }
   if (req?.user?.role === "team_lead") {
-    query.team_lead_id = req.user._id;
+    additionalQueryParams.team_lead_id = req.user._id;
   }
-  query.created_at = { $gte: getLastWeeksDate() };
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
   try {
@@ -183,32 +209,45 @@ export const getAccomodation = catchAsyncErrors(async (req, res, next) => {
     page,
   } = req.query;
 
-  const query = {};
+  const additionalQueryParams = {};
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (stateFilter !== "") {
-    query.state = stateFilter;
+    additionalQueryParams.state = stateFilter;
   }
   if (lgaFilter !== "") {
-    query.lga = lgaFilter;
+    additionalQueryParams.lga = lgaFilter;
   }
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (typeFilter !== "") {
-    query.type = typeFilter;
+    additionalQueryParams.type = typeFilter;
   }
   if (roomsFilter !== "") {
-    query.rooms = roomsFilter;
+    additionalQueryParams.rooms = roomsFilter;
   }
   if (prizeFilter !== "") {
-    query.prize = prizeFilter;
+    additionalQueryParams.prize = prizeFilter;
   }
   if (req?.user?.role === "team_lead") {
-    query.team_lead_id = req.user._id;
+    additionalQueryParams.team_lead_id = req.user._id;
   }
-  query.created_at = { $gte: getLastWeeksDate() };
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
 
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
@@ -258,26 +297,39 @@ export const getElectricity = catchAsyncErrors(async (req, res, next) => {
     page,
   } = req.query;
 
-  const query = {};
+  const additionalQueryParams = {};
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (stateFilter !== "") {
-    query.state = stateFilter;
+    additionalQueryParams.state = stateFilter;
   }
   if (lgaFilter !== "") {
-    query.lga = lgaFilter;
+    additionalQueryParams.lga = lgaFilter;
   }
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (hourPerWeekFilter !== "") {
-    query.hours_per_week = hourPerWeekFilter;
+    additionalQueryParams.hours_per_week = hourPerWeekFilter;
   }
   if (req?.user?.role === "team_lead") {
-    query.team_lead_id = req.user._id;
+    additionalQueryParams.team_lead_id = req.user._id;
   }
-  query.created_at = { $gte: getLastWeeksDate() };
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
 
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
@@ -327,32 +379,45 @@ export const getQuestions = catchAsyncErrors(async (req, res, next) => {
     page,
   } = req.query;
 
-  const query = {};
+  const additionalQueryParams = {};
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (stateFilter !== "") {
-    query.state = stateFilter;
+    additionalQueryParams.state = stateFilter;
   }
   if (lgaFilter !== "") {
-    query.lga = lgaFilter;
+    additionalQueryParams.lga = lgaFilter;
   }
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (accidentFilter !== "") {
-    query.accidents = accidentFilter;
+    additionalQueryParams.accidents = accidentFilter;
   }
   if (crimeReportFilter !== "") {
-    query.crime_report = crimeReportFilter;
+    additionalQueryParams.crime_report = crimeReportFilter;
   }
   if (governmentProjectFilterFilter !== "") {
-    query.government_project = governmentProjectFilter;
+    additionalQueryParams.government_project = governmentProjectFilter;
   }
   if (req?.user?.role === "team_lead") {
-    query.team_lead_id = req.user._id;
+    additionalQueryParams.team_lead_id = req.user._id;
   }
-  query.created_at = { $gte: getLastWeeksDate() };
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
 
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
@@ -416,32 +481,45 @@ export const getOtherProducts = catchAsyncErrors(async (req, res, next) => {
     page,
   } = req.query;
 
-  const query = {};
+  const additionalQueryParams = {};
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (stateFilter !== "") {
-    query.state = stateFilter;
+    additionalQueryParams.state = stateFilter;
   }
   if (lgaFilter !== "") {
-    query.lga = lgaFilter;
+    additionalQueryParams.lga = lgaFilter;
   }
   if (regionFilter !== "") {
-    query.region = regionFilter;
+    additionalQueryParams.region = regionFilter;
   }
   if (nameFilter !== "") {
-    query.name = nameFilter;
+    additionalQueryParams.name = nameFilter;
   }
   if (brandFilter !== "") {
-    query.brand = brandFilter;
+    additionalQueryParams.brand = brandFilter;
   }
   if (priceFilter !== "") {
-    query.price = priceFilter;
+    additionalQueryParams.price = priceFilter;
   }
   if (req?.user?.role === "team_lead") {
-    query.team_lead_id = req.user._id;
+    additionalQueryParams.team_lead_id = req.user._id;
   }
-  query.created_at = { $gte: getLastWeeksDate() };
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
 
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
