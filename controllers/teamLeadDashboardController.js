@@ -1,7 +1,12 @@
 import Product from "../models/productModel.js";
+import Form from "../models/formModel.js";
+import Enumerator from "../models/enumeratorModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import APIQueries from "../utils/apiQueries.js";
+import "../utils/dateUtils.js";
+
+const currentWeek = new Date().getWeek();
 
 export const getPriceFluctuation = async (req, res) => {
   const { lgaFilter } = req.query;
@@ -135,6 +140,40 @@ export const getPriceFluctuation = async (req, res) => {
         res.status(200).json(results);
       }
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getSubmisionRate = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.team_lead_id = req.user._id;
+  }
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const totalSubmision = await Form.countDocuments(query);
+    const totalEnumerators = await Enumerator.countDocuments({
+      user: req.user._id,
+    });
+    const notSubmited = totalEnumerators - totalSubmision;
+    res
+      .status(200)
+      .json({ submited: totalSubmision, notSubmited: notSubmited });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
