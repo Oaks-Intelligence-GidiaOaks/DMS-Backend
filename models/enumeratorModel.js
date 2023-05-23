@@ -81,6 +81,7 @@ const EnumeratorSchema = new Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  created_at: { type: Date, default: new Date() },
 });
 
 EnumeratorSchema.pre("save", async function (next) {
