@@ -16,6 +16,7 @@ import "../utils/dateUtils.js";
 //   return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
 // }
 const currentWeek = new Date().getWeek();
+
 // get food product api/v1/form_response/food_product
 export const getFoodProduct = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -378,8 +379,8 @@ export const getQuestions = catchAsyncErrors(async (req, res, next) => {
     accidentFilter = "",
     page,
   } = req.query;
-
   const additionalQueryParams = {};
+
   if (regionFilter !== "") {
     additionalQueryParams.region = regionFilter;
   }
@@ -389,16 +390,13 @@ export const getQuestions = catchAsyncErrors(async (req, res, next) => {
   if (lgaFilter !== "") {
     additionalQueryParams.lga = lgaFilter;
   }
-  if (regionFilter !== "") {
-    additionalQueryParams.region = regionFilter;
-  }
   if (accidentFilter !== "") {
     additionalQueryParams.accidents = accidentFilter;
   }
   if (crimeReportFilter !== "") {
     additionalQueryParams.crime_report = crimeReportFilter;
   }
-  if (governmentProjectFilterFilter !== "") {
+  if (governmentProjectFilter !== "") {
     additionalQueryParams.government_project = governmentProjectFilter;
   }
   if (req?.user?.role === "team_lead") {
