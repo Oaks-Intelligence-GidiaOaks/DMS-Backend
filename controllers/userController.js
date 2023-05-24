@@ -208,8 +208,10 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
       }
 
       const passwordMatch = user.isPasswordMatch(password);
+      const token = sendToken(user);
 
-      passwordMatch && sendToken(user, 200, res);
+      res.status(200).json({ user, token });
+      // passwordMatch && sendToken(user, 200, res);
     } else {
       const enumerator = await Enumerator.findOne({ id }).select("+password");
 
@@ -227,8 +229,10 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
       }
 
       const passwordMatch = enumerator.isPasswordMatch(password);
+      const token = sendToken(enumerator);
 
-      passwordMatch && sendToken(enumerator, 200, res);
+      res.status(200).json({ enumerator, token });
+      // passwordMatch && sendToken(enumerator, 200, res);
     }
   } catch (error) {
     res.status(401).json({ message: error.message, stack: error.stack });
