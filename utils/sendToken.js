@@ -10,6 +10,7 @@ const sendToken = (user, statusCode, res) => {
     ),
     httpOnly: true,
     path: "/",
+    domain: "https://dms-backend-p8qw.onrender.com",
   };
 
   res.status(statusCode).cookie("token", token, options).json({
