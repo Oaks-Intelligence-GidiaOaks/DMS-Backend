@@ -5,6 +5,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import sendToken from "../utils/sendToken.js";
 import { generateId, generatePassword } from "../utils/generateId.js";
 import sendEmail from "../utils/sendEmail.js";
+import cloudinary from "cloudinary";
 import error from "../middlewares/error.js";
 import { request } from "express";
 
@@ -47,10 +48,10 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
       email,
       role,
       password: "123456",
-      // avarter: {
-      //   public_id: resultUserAvarter.public_id,
-      //   url: resultUserAvarter.secure_url
-      // },
+      avarter: {
+        public_id: "resultUserAvarter.public_id",
+        url: "resultUserAvarter.secure_url",
+      },
       state,
       LGA,
     });
@@ -140,10 +141,10 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
       phoneNumber,
       identityType,
       identity,
-      // avarter: {
-      //   public_id: resultUserAvarter.public_id,
-      //   url: resultUserAvarter.secure_url
-      // },
+      identityImage: {
+        public_id: "resultUserAvarter.public_id",
+        url: "resultUserAvarter.secure_url",
+      },
       state,
       LGA,
       user: req.user._id,
