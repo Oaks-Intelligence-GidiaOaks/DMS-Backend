@@ -5,6 +5,8 @@ import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import APIQueries from "../utils/apiQueries.js";
 import "../utils/dateUtils.js";
+import fs from "fs";
+import { lgaData } from "../data/lga.js";
 
 // Helper function to get the week number of a given date
 const getWeekNumber = (date) => {
@@ -310,5 +312,39 @@ export const getEnumeratorsCount = async (req, res) => {
     res.status(200).json({ totalEnumerators, newlyAdded });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getLGACount = (req, res) => {
+  try {
+    // Read the JSON file
+    // fs.readFile("../data/lga.json", "utf8", (err, data) => {
+    //   if (err) {
+    //     console.error(err);
+    //     return;
+    //   }
+
+    // Parse the JSON data
+    //   const lgas = JSON.parse(data);
+    const lgas = lgaData;
+
+    // Count the LGAs for each state
+    const stateCounts = {};
+    for (const lga of lgas) {
+      const state = lga.state;
+      if (stateCounts[state]) {
+        stateCounts[state]++;
+      } else {
+        stateCounts[state] = 1;
+      }
+    }
+
+    // Output the state counts
+    for (const state in stateCounts) {
+      console.log(`State: ${state}, LGA Count: ${stateCounts[state]}`);
+    }
+    // });
+  } catch (error) {
+    res.status(500).json({ message: error });
   }
 };
