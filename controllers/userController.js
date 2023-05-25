@@ -8,7 +8,6 @@ import sendEmail from "../utils/sendEmail.js";
 import cloudinary from "cloudinary";
 import error from "../middlewares/error.js";
 import { request } from "express";
-import cloudinary from "cloudinary";
 
 // Create team lead/admin api/v1/user/new ****
 export const createUser = catchAsyncErrors(async (req, res, next) => {
