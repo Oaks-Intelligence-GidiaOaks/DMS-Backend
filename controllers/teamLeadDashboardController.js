@@ -62,6 +62,7 @@ const previousWeekNos = [
   currentWeek - 1,
   currentWeek - 2,
   currentWeek - 3,
+  currentWeek - 4,
 ];
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
@@ -110,13 +111,13 @@ export const getPriceFluctuation = async (req, res) => {
             .exec();
 
           const price = weekPrice ? weekPrice.price : 0;
-          weeklyPrice.push({ weekNo, price });
+          weeklyPrice.push({ x: weekNo, y: price });
           totalPrice += price;
         }
 
         const priceChange = calculatePercentageChange(
-          weeklyPrice[0].price,
-          weeklyPrice[3].price
+          weeklyPrice[0].y,
+          weeklyPrice[1].y
         );
 
         return {
@@ -268,6 +269,7 @@ export const getSubmisionRate = async (req, res) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
+  log(req.user);
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [

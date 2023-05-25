@@ -32,14 +32,14 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
       id = generateId();
     }
 
-    const resultUserAvarter = await cloudinary.v2.uploader.upload(
-      req.body.avarter,
-      {
-        folder: "avarters",
-        width: 150,
-        crop: "scale",
-      }
-    );
+    // const resultUserAvarter = await cloudinary.v2.uploader.upload(
+    //   req.body.avarter,
+    //   {
+    //     folder: "avarters",
+    //     width: 150,
+    //     crop: "scale",
+    //   }
+    // );
 
     const newUser = await User.create({
       id,
@@ -74,7 +74,7 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
     // sendToken(newUser, 200, res);
     res.status(200).json({
       success: true,
-      user,
+      newUser,
     });
   } catch (error) {
     res.status(400).json({
@@ -119,7 +119,8 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Generate a new password
-    const password = generatePassword();
+    // const password = generatePassword();
+    const password = 123456;
     console.log(password, "**pass");
 
     // const resultUserAvarter = await cloudinary.v2.uploader.upload(
@@ -130,7 +131,6 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
     //     crop: "scale",
     //   }
     // );
-
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
       firstName,
@@ -231,7 +231,7 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
       const passwordMatch = enumerator.isPasswordMatch(password);
       const token = sendToken(enumerator);
 
-      res.status(200).json({ enumerator, token });
+      res.status(200).json({ user: enumerator, token });
       // passwordMatch && sendToken(enumerator, 200, res);
     }
   } catch (error) {
@@ -499,7 +499,10 @@ export const seedSuperAdmin = catchAsyncErrors(async (req, res, next) => {
       password,
       role: "super_admin",
     });
-    sendToken(user, 200, res);
+    // sendToken(user, 200, res);
+    const token = sendToken(user);
+
+    res.status(200).json({ user, token });
   } catch (error) {
     res.status(400).json({
       message: error.message,
