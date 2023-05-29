@@ -42,9 +42,11 @@ const userSchema = new Schema({
       type: String,
     },
   },
-  state: {
-    type: String,
-  },
+  state: [
+    {
+      type: String,
+    },
+  ],
   disabled: {
     type: Boolean,
     default: false,

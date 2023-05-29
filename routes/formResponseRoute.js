@@ -13,7 +13,12 @@ import {
   updateQuestions,
   updateTransport,
 } from "../controllers/formResponseController.js";
-import { getResponseTracker } from "../controllers/responseTrackerController.js";
+import {
+  getResponseTracker,
+  approveResponse,
+  getSubmissionTime,
+} from "../controllers/responseTrackerController.js";
+import { getMasterListData } from "../controllers/masterListController.js";
 import { isAuthenticatedUser } from "../middlewares/auth.js";
 
 const router = express.Router();
@@ -31,5 +36,9 @@ router.patch("/questions/:id", isAuthenticatedUser, updateQuestions);
 router.get("/other_products", isAuthenticatedUser, getOtherProducts);
 router.patch("/other_products/:id", isAuthenticatedUser, updateOtherProducts);
 router.get("/response_tracker", isAuthenticatedUser, getResponseTracker);
+router.get("/submission_time", isAuthenticatedUser, getSubmissionTime);
+router.post("/approve_response", isAuthenticatedUser, approveResponse);
+
+router.get("/master_list_data", isAuthenticatedUser, getMasterListData);
 
 export default router;
