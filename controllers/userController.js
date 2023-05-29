@@ -9,6 +9,14 @@ import cloudinary from "cloudinary";
 import error from "../middlewares/error.js";
 import { request } from "express";
 
+const currentDate = new Date();
+const currentYear = currentDate.getFullYear();
+const currentMonth = currentDate.getMonth() + 1;
+
+// Get the start and end timestamps of the current month
+const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
+const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
+
 // Create team lead/admin api/v1/user/new ****
 export const createUser = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -389,14 +397,28 @@ export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Get all enumerators api/v1/enumerators
-export const getAllEnumerators = catchAsyncErrors(async (req, res, next) => {
-  const enumerators = await Enumerator.find();
+export const getAllEnumerators = async (req, res, next) => {
+  const query = {};
+  if (req?.user?.role === "team_lead") {
+    query.user = req.user._id;
+  }
+  const enumerators = await Enumerator.find(query);
+  const totalEnumerators = await Enumerator.countDocuments({
+    user: req.user._id,
+    disabled: false,
+  });
+  const newlyAdded = await Enumerator.countDocuments({
+    created_at: { $gte: startOfMonth, $lt: endOfMonth },
+    user: req.user._id,
+  });
 
   res.status(200).json({
     message: "success",
     enumerators,
+    totalEnumerators,
+    newlyAdded,
   });
-});
+};
 
 // Get specific user => api/v1/admin/users/:id ****
 export const getOneUser = catchAsyncErrors(async (req, res, next) => {
@@ -411,6 +433,24 @@ export const getOneUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     user,
+  });
+});
+
+// Get specific Enumerator => api/v1/admin/Enumerator/:id ****
+export const getOneEnumerator = catchAsyncErrors(async (req, res, next) => {
+  const user = await Enumerator.findById(req.params.id);
+
+  if (!user) {
+    return next(
+      new ErrorHandler(`Enumerator with id ${req.params.id} does not exist`)
+    );
+  }
+  const totalSubmision = await Form.countDocuments({ created_by: user._id });
+
+  res.status(200).json({
+    success: true,
+    user,
+    totalSubmision,
   });
 });
 

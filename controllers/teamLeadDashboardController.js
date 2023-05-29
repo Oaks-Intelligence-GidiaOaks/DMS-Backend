@@ -116,8 +116,8 @@ export const getPriceFluctuation = async (req, res) => {
         }
 
         const priceChange = calculatePercentageChange(
-          weeklyPrice[0].y,
-          weeklyPrice[1].y
+          weeklyPrice[1].y,
+          weeklyPrice[0].y
         );
 
         return {
@@ -269,8 +269,6 @@ export const getSubmisionRate = async (req, res) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
-  log(req.user);
-  // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
       {
@@ -301,14 +299,12 @@ export const getSubmisionRate = async (req, res) => {
 
 export const getEnumeratorsCount = async (req, res) => {
   try {
-    console.log(startOfMonth, endOfMonth);
-    // console.log(endOfMonth);
     const totalEnumerators = await Enumerator.countDocuments({
       user: req.user._id,
       disabled: false,
     });
     const newlyAdded = await Enumerator.countDocuments({
-      created_at: { $gte: startOfMonth, $lt: endOfMonth },
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
       user: req.user._id,
     });
     res.status(200).json({ totalEnumerators, newlyAdded });
@@ -319,34 +315,159 @@ export const getEnumeratorsCount = async (req, res) => {
 
 export const getLGACount = (req, res) => {
   try {
-    // Read the JSON file
-    // fs.readFile("../data/lga.json", "utf8", (err, data) => {
-    //   if (err) {
-    //     console.error(err);
-    //     return;
-    //   }
-
-    // Parse the JSON data
-    //   const lgas = JSON.parse(data);
     const lgas = lgaData;
-
     // Count the LGAs for each state
-    const stateCounts = {};
+    const stateCounts = [];
     for (const lga of lgas) {
-      const state = lga.state;
-      if (stateCounts[state]) {
-        stateCounts[state]++;
-      } else {
-        stateCounts[state] = 1;
-      }
+      stateCounts.push({
+        state: lga.state,
+        lgaCount: lga.lgas.length,
+      });
     }
-
-    // Output the state counts
-    for (const state in stateCounts) {
-      console.log(`State: ${state}, LGA Count: ${stateCounts[state]}`);
-    }
-    // });
+    let totalLga = 0;
+    req.user.state.forEach((state) => {
+      stateCounts.map((item) => {
+        if (item.state === state) {
+          totalLga += item.lgaCount;
+        }
+      });
+    });
+    res.status(200).json({ totalLga, assignedLga: req.user.LGA.length });
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getYearlyEnumerators = async (req, res) => {
+  try {
+    const { yearFilter = "" } = req.query;
+    const currentYear = yearFilter ? yearFilter : new Date().getFullYear();
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+
+    Enumerator.aggregate([
+      {
+        $match: {
+          user: req.user._id,
+          created_at: {
+            $gte: new Date(currentYear, 0, 1), // Start of the current year
+            $lte: new Date(currentYear, 11, 31), // End of the current year
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%m-%Y",
+              date: "$created_at",
+            },
+          },
+          added: {
+            $sum: 1,
+          },
+          disabled: {
+            $sum: {
+              $cond: [{ $eq: ["$disabled", true] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          month: {
+            $let: {
+              vars: {
+                months: months,
+              },
+              in: {
+                $arrayElemAt: [
+                  "$$months",
+                  { $subtract: [{ $toInt: { $substrCP: ["$_id", 0, 2] } }, 1] },
+                ],
+              },
+            },
+          },
+          added: 1,
+          disabled: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          month: 1,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          monthlyData: {
+            $push: {
+              month: "$month",
+              added: "$added",
+              disabled: "$disabled",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          monthlyData: {
+            $map: {
+              input: months,
+              as: "month",
+              in: {
+                $let: {
+                  vars: {
+                    matchedData: {
+                      $filter: {
+                        input: "$monthlyData",
+                        cond: { $eq: ["$$this.month", "$$month"] },
+                      },
+                    },
+                  },
+                  in: {
+                    $cond: {
+                      if: { $gt: [{ $size: "$$matchedData" }, 0] },
+                      then: { $arrayElemAt: ["$$matchedData", 0] },
+                      else: { month: "$$month", added: 0, disabled: 0 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $unwind: "$monthlyData",
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$monthlyData",
+        },
+      },
+    ]).exec((err, results) => {
+      if (err) {
+        console.error("Error:", err);
+      } else {
+        res.status(200).json(results);
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

@@ -415,7 +415,7 @@ export const lgaData = [
     ],
   },
   {
-    state: "Federal Capital Territory",
+    state: "FCT",
     alias: "abuja",
     lgas: [
       "Abaji",
