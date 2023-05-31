@@ -8,6 +8,10 @@ const FormSchema = new Schema({
     ref: "Enumerator",
     required: true,
   },
+  updated_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
   state: { type: String, required: true },
   lga: { type: String, required: true },
   region: { type: String },

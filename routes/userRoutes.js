@@ -17,6 +17,9 @@ import {
   disableEnumerator,
   seedSuperAdmin,
   getOneEnumerator,
+  getAllTeamLead,
+  assignLga,
+  updateEnumeratorProfileAdmin,
 } from "../controllers/userController.js";
 import { isAuthenticatedUser, authorizeRoles } from "../middlewares/auth.js";
 
@@ -40,6 +43,12 @@ router.get(
   isAuthenticatedUser,
   authorizeRoles("super_admin"),
   getAllUsers
+);
+router.get(
+  "/admin/team_lead",
+  isAuthenticatedUser,
+  authorizeRoles("super_admin", "admin"),
+  getAllTeamLead
 );
 router.get(
   "/admin/enumerators",
@@ -66,10 +75,22 @@ router.put(
   updateUserProfileAdmin
 );
 router.put(
+  "/admin/enumerator/:id",
+  isAuthenticatedUser,
+  authorizeRoles("super_admin", "team_lead", "admin"),
+  updateEnumeratorProfileAdmin
+);
+router.put(
   "/admin/user/:id",
   isAuthenticatedUser,
   authorizeRoles("super_admin"),
   disableUser
+);
+router.put(
+  "/admin/team_lead/assign_lga/:id",
+  isAuthenticatedUser,
+  authorizeRoles("super_admin", "admin"),
+  assignLga
 );
 router.put(
   "/admin/enumerator/disable/:id",

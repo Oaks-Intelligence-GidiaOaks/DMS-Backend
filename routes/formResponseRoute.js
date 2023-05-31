@@ -17,6 +17,7 @@ import {
   getResponseTracker,
   approveResponse,
   getSubmissionTime,
+  getAllSubmissionTime,
 } from "../controllers/responseTrackerController.js";
 import { getMasterListData } from "../controllers/masterListController.js";
 import { isAuthenticatedUser } from "../middlewares/auth.js";
@@ -37,6 +38,7 @@ router.get("/other_products", isAuthenticatedUser, getOtherProducts);
 router.patch("/other_products/:id", isAuthenticatedUser, updateOtherProducts);
 router.get("/response_tracker", isAuthenticatedUser, getResponseTracker);
 router.get("/submission_time", isAuthenticatedUser, getSubmissionTime);
+router.get("/all_submission_time", isAuthenticatedUser, getAllSubmissionTime);
 router.post("/approve_response", isAuthenticatedUser, approveResponse);
 
 router.get("/master_list_data", isAuthenticatedUser, getMasterListData);
