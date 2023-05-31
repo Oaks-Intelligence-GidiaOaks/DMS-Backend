@@ -5,16 +5,23 @@ import Enumerator from "../models/enumeratorModel.js";
 import catchAsyncErrors from "./catchAsyncError.js";
 
 // Check if user is authenticated
-export const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
-  // const { token } = req.cookies;
-  const token = req.headers.authorization.split(" ")[1];
-  if (!token) {
-    res.status(401).json({ message: "Please log in to access this resource." });
+// export const isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
+export const isAuthenticatedUser = async (req, res, next) => {
+  try {
+    // const { token } = req.cookies;
+    const token = req.headers.authorization.split(" ")[1];
+    if (!token) {
+      res
+        .status(401)
+        .json({ message: "Please log in to access this resource." });
+    }
+    const decoded = Jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findOne({ id: decoded.user.id });
+    next();
+  } catch (err) {
+    console.log(err);
   }
-  const decoded = Jwt.verify(token, process.env.JWT_SECRET);
-  req.user = await User.findOne({ id: decoded.user.id });
-  next();
-});
+};
 
 export const isAuthenticatedEnumerator = catchAsyncErrors(
   async (req, res, next) => {

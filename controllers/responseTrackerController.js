@@ -93,6 +93,7 @@ export const getResponseTracker = catchAsyncErrors(async (req, res, next) => {
                 return {
                   first_name: enumerator.firstName,
                   last_name: enumerator.lastName,
+                  id: enumerator.id,
                   state,
                   lga,
                   created_at,
