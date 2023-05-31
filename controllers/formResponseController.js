@@ -18,7 +18,7 @@ import "../utils/dateUtils.js";
 const currentWeek = new Date().getWeek();
 
 // get food product api/v1/form_response/food_product
-export const getFoodProduct = catchAsyncErrors(async (req, res, next) => {
+export const getFoodProduct = async (req, res) => {
   const {
     searchQuery = "",
     regionFilter = "",
@@ -55,6 +55,9 @@ export const getFoodProduct = catchAsyncErrors(async (req, res, next) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
   const query = {
     $and: [
       {
@@ -74,18 +77,17 @@ export const getFoodProduct = catchAsyncErrors(async (req, res, next) => {
 
   try {
     const totalCount = await Product.countDocuments(query);
-    const data = await Product.find(query)
-      .populate({
-        path: "created_by",
-      })
-      .skip(skip)
-      .limit(10);
+    const data = await Product.find(query).populate({
+      path: "created_by",
+    });
+    // .skip(skip)
+    // .limit(20);
 
     res.status(200).json({ data, totalCount });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 //update food product api/v1/form_response/food_product/id
 export const updateFoodProduct = async (req, res) => {
@@ -109,7 +111,7 @@ export const updateFoodProduct = async (req, res) => {
 };
 
 // get transport api/v1/form_response/transport
-export const getTransport = catchAsyncErrors(async (req, res, next) => {
+export const getTransport = async (req, res) => {
   const {
     searchQuery = "",
     regionFilter = "",
@@ -146,6 +148,9 @@ export const getTransport = catchAsyncErrors(async (req, res, next) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
@@ -174,7 +179,7 @@ export const getTransport = catchAsyncErrors(async (req, res, next) => {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 //update Transport api/v1/form_response/transport/id
 export const updateTransport = async (req, res) => {
@@ -198,7 +203,7 @@ export const updateTransport = async (req, res) => {
 };
 
 // get accomodation  api/v1/form_response/accomodation
-export const getAccomodation = catchAsyncErrors(async (req, res, next) => {
+export const getAccomodation = async (req, res) => {
   const {
     searchQuery = "",
     regionFilter = "",
@@ -235,6 +240,9 @@ export const getAccomodation = catchAsyncErrors(async (req, res, next) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
@@ -264,7 +272,7 @@ export const getAccomodation = catchAsyncErrors(async (req, res, next) => {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 //update accomodation api/v1/form_response/transport/id
 export const updateAccomodation = async (req, res) => {
@@ -288,7 +296,7 @@ export const updateAccomodation = async (req, res) => {
 };
 
 // get electricity api/v1/form_response/electricity
-export const getElectricity = catchAsyncErrors(async (req, res, next) => {
+export const getElectricity = async (req, res) => {
   const {
     searchQuery = "",
     regionFilter = "",
@@ -316,6 +324,9 @@ export const getElectricity = catchAsyncErrors(async (req, res, next) => {
   }
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
   }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
@@ -346,7 +357,7 @@ export const getElectricity = catchAsyncErrors(async (req, res, next) => {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 //update electricity api/v1/form_response/electricity/id
 export const updateElectricity = async (req, res) => {
@@ -368,7 +379,7 @@ export const updateElectricity = async (req, res) => {
 };
 
 // get questions api/v1/form_response/questions
-export const getQuestions = catchAsyncErrors(async (req, res, next) => {
+export const getQuestions = async (req, res) => {
   const {
     searchQuery = "",
     regionFilter = "",
@@ -402,6 +413,9 @@ export const getQuestions = catchAsyncErrors(async (req, res, next) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
@@ -431,7 +445,7 @@ export const getQuestions = catchAsyncErrors(async (req, res, next) => {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 //update questions api/v1/form_response/questions/id
 export const updateQuestions = async (req, res) => {
@@ -467,7 +481,7 @@ export const updateQuestions = async (req, res) => {
 };
 
 // get other product api/v1/form_response/other_products
-export const getOtherProducts = catchAsyncErrors(async (req, res, next) => {
+export const getOtherProducts = async (req, res) => {
   const {
     searchQuery = "",
     regionFilter = "",
@@ -504,6 +518,9 @@ export const getOtherProducts = catchAsyncErrors(async (req, res, next) => {
   if (req?.user?.role === "team_lead") {
     additionalQueryParams.team_lead_id = req.user._id;
   }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
@@ -533,7 +550,7 @@ export const getOtherProducts = catchAsyncErrors(async (req, res, next) => {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 //update other products api/v1/form_response/other_products/id
 export const updateOtherProducts = async (req, res) => {

@@ -13,6 +13,10 @@ export const getMasterListData = async (req, res) => {
       additionalQueryParams.team_lead_id = req.user._id;
     }
 
+    if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+      additionalQueryParams.approved = 1;
+    }
+
     const query = {
       $and: [
         {
@@ -38,7 +42,7 @@ export const getMasterListData = async (req, res) => {
         "questions",
         "government_project comment_for_government_project crime_report comment_for_crime_report accidents comment_for_accidents note"
       )
-      .populate("created_by", "id") // Populate created_by and select the name and _id fields
+      .populate("created_by") // Populate created_by and select the name and _id fields
       .exec((err, forms) => {
         if (err) {
           console.error(err);

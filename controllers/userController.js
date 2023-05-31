@@ -18,7 +18,7 @@ const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
 const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 
 // Create team lead/admin api/v1/user/new ****
-export const createUser = catchAsyncErrors(async (req, res, next) => {
+export const createUser = async (req, res) => {
   try {
     const { firstName, lastName, email, role, state, LGA } = req.body;
     const user = await User.findOne({ email });
@@ -90,10 +90,10 @@ export const createUser = catchAsyncErrors(async (req, res, next) => {
       stack: error.stack,
     });
   }
-});
+};
 
 // Create enumerator lead/admin api/v1/enumerator/new ****
-export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
+export const createEnumerator = async (req, res) => {
   try {
     const {
       firstName,
@@ -184,10 +184,10 @@ export const createEnumerator = catchAsyncErrors(async (req, res, next) => {
     // res.status(500).json({ message: error.message, stack: error.stack });
     res.status(500).json(error.message);
   }
-});
+};
 
 // Login user api/v1/login ****
-export const loginUser = catchAsyncErrors(async (req, res, next) => {
+export const loginUser = async (req, res) => {
   try {
     const { id, password } = req.body;
 
@@ -245,10 +245,10 @@ export const loginUser = catchAsyncErrors(async (req, res, next) => {
   } catch (error) {
     res.status(401).json({ message: error.message, stack: error.stack });
   }
-});
+};
 
 // Forgot password => api/v1/password/reset ****
-export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
+export const forgotPassword = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
@@ -285,10 +285,10 @@ export const forgotPassword = catchAsyncErrors(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 // Reset password => api/v1/password/reset/:token ****
-export const resetPassword = catchAsyncErrors(async (req, res, next) => {
+export const resetPassword = async (req, res) => {
   // Hash the url Token
   const resetPasswordToken = crypto
     .createHash("sha256")
@@ -316,10 +316,10 @@ export const resetPassword = catchAsyncErrors(async (req, res, next) => {
 
   await user.save();
   sendToken(user, 200, res);
-});
+};
 
 // Get currently logged in user profile => api/v1/me ****
-export const getUserProfile = catchAsyncErrors(async (req, res, next) => {
+export const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user.id);
 
   if (user.disabled) {
@@ -333,10 +333,10 @@ export const getUserProfile = catchAsyncErrors(async (req, res, next) => {
     success: true,
     user,
   });
-});
+};
 
 // Update password => api/v1/password/update ****
-export const updatePassword = catchAsyncErrors(async (req, res, next) => {
+export const updatePassword = async (req, res) => {
   const user = await User.findById(req.user.id).select("+password");
 
   // Verify old password is correct
@@ -349,10 +349,10 @@ export const updatePassword = catchAsyncErrors(async (req, res, next) => {
   user.password = req.body.newPassword;
   await user.save();
   sendToken(user, 200, res);
-});
+};
 
 // Update user details/profile => api/v1/me/update ****
-export const updateUserProfile = catchAsyncErrors(async (req, res, next) => {
+export const updateUserProfile = async (req, res) => {
   const newUserDetails = {
     firstname: req.body.firstname,
     lastname: req.body.lastname,
@@ -373,28 +373,38 @@ export const updateUserProfile = catchAsyncErrors(async (req, res, next) => {
     success: true,
     user,
   });
-});
+};
 
 // Logout user => api/v1/logout ****
-export const logoutUser = catchAsyncErrors(async (req, res, next) => {
+export const logoutUser = async (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()), httpOnly: true });
   res.status(200).json({
     success: true,
     message: "Logged out",
   });
-});
+};
 
 // Admin Routes ********
 
 // Get all users => api/v1/admin/users ****
-export const getAllUsers = catchAsyncErrors(async (req, res, next) => {
+export const getAllUsers = async (req, res) => {
   const users = await User.find();
 
   res.status(200).json({
     success: true,
     users,
   });
-});
+};
+
+// Get all teamlead => api/v1/admin/team_lead ****
+export const getAllTeamLead = async (req, res) => {
+  const users = await User.find({ role: "team_lead", disabled: false });
+
+  res.status(200).json({
+    success: true,
+    users,
+  });
+};
 
 // Get all enumerators api/v1/enumerators
 export const getAllEnumerators = async (req, res, next) => {
@@ -421,7 +431,7 @@ export const getAllEnumerators = async (req, res, next) => {
 };
 
 // Get specific user => api/v1/admin/users/:id ****
-export const getOneUser = catchAsyncErrors(async (req, res, next) => {
+export const getOneUser = async (req, res) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
@@ -434,10 +444,10 @@ export const getOneUser = catchAsyncErrors(async (req, res, next) => {
     success: true,
     user,
   });
-});
+};
 
 // Get specific Enumerator => api/v1/admin/Enumerator/:id ****
-export const getOneEnumerator = catchAsyncErrors(async (req, res, next) => {
+export const getOneEnumerator = async (req, res) => {
   const user = await Enumerator.findById(req.params.id);
 
   if (!user) {
@@ -452,37 +462,80 @@ export const getOneEnumerator = catchAsyncErrors(async (req, res, next) => {
     user,
     totalSubmision,
   });
-});
+};
 
 // Update user details/profile ADMIN => api/v1/admin/user/:id ****
-export const updateUserProfileAdmin = catchAsyncErrors(
-  async (req, res, next) => {
-    const newUserDetails = {
-      firstname: req.body.firstname,
-      lastname: req.body.lastname,
-      email: req.body.email,
-      phoneNumber: req.body.phoneNumber,
-      id: req.body.id,
-      state: req.body.state,
-      LGA: req.body.LGA,
-      role: req.body.role,
-    };
+export const updateUserProfileAdmin = async (req, res) => {
+  const newUserDetails = {
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
+    id: req.body.id,
+    state: req.body.state,
+    LGA: req.body.LGA,
+    role: req.body.role,
+  };
 
-    const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
+  const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+};
+
+// Update user details/profile ADMIN => api/v1/admin/user/:id ****
+export const updateEnumeratorProfileAdmin = async (req, res) => {
+  const newUserDetails = {
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
+    id: req.body.id,
+    state: req.body.state,
+    LGA: req.body.LGA,
+  };
+
+  const user = await Enumerator.findByIdAndUpdate(
+    req.params.id,
+    newUserDetails,
+    {
       new: true,
       runValidators: true,
       useFindAndModify: false,
-    });
+    }
+  );
 
-    res.status(200).json({
-      success: true,
-      user,
+  res.status(200).json({
+    success: true,
+    user,
+  });
+};
+
+// reassign lga to teamLead => api/v1/admin/team_lead/assign_lga/:id
+export const assignLga = async (req, res) => {
+  try {
+    const { lga } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      res.status(401).json({ message: "User not found" });
+    }
+    lga.map((item) => {
+      user.LGA.push(item);
     });
+    res.status(200).json({ message: "user LGA assigned successfully", User });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-);
+};
 
 // Disable enumerator ADMIN => api/v1/admin/enumerator/:id/disable ****
-export const disableEnumerator = catchAsyncErrors(async (req, res, next) => {
+export const disableEnumerator = async (req, res) => {
   const enumerator = await Enumerator.findByIdAndUpdate(
     req.params.id,
     { disabled: true },
@@ -501,10 +554,10 @@ export const disableEnumerator = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "enumerator disabled",
   });
-});
+};
 
 // Disable user ADMIN => api/v1/admin/enumerator/:id/disable ****
-export const disableUser = catchAsyncErrors(async (req, res, next) => {
+export const disableUser = async (req, res) => {
   const user = await User.findByIdAndUpdate(
     req.params.id,
     { disabled: true },
@@ -523,10 +576,10 @@ export const disableUser = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "user disabled",
   });
-});
+};
 
 // Seed super admin => api/v1/seed
-export const seedSuperAdmin = catchAsyncErrors(async (req, res, next) => {
+export const seedSuperAdmin = async (req, res) => {
   try {
     const { firstName, lastName, password, email } = req.body;
     const id = generateId();
@@ -555,4 +608,4 @@ export const seedSuperAdmin = catchAsyncErrors(async (req, res, next) => {
   // }
 
   //
-});
+};
