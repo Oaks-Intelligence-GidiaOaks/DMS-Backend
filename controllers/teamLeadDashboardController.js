@@ -58,11 +58,11 @@ const getCurrentWeekPrice = (product) => {
 const currentDate = new Date();
 const currentWeek = getWeekNumber(currentDate);
 const previousWeekNos = [
-  currentWeek,
-  currentWeek - 1,
-  currentWeek - 2,
-  currentWeek - 3,
   currentWeek - 4,
+  currentWeek - 3,
+  currentWeek - 2,
+  currentWeek - 1,
+  currentWeek,
 ];
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
@@ -116,8 +116,8 @@ export const getPriceFluctuation = async (req, res) => {
         }
 
         const priceChange = calculatePercentageChange(
-          weeklyPrice[1].y,
-          weeklyPrice[0].y
+          weeklyPrice[3].y,
+          weeklyPrice[4].y
         );
 
         return {
