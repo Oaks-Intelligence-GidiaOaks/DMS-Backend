@@ -491,30 +491,34 @@ export const updateUserProfileAdmin = async (req, res) => {
 
 // Update user details/profile ADMIN => api/v1/admin/user/:id ****
 export const updateEnumeratorProfileAdmin = async (req, res) => {
-  const newUserDetails = {
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    email: req.body.email,
-    phoneNumber: req.body.phoneNumber,
-    id: req.body.id,
-    state: req.body.state,
-    LGA: req.body.LGA,
-  };
+  try {
+    const newUserDetails = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      id: req.body.id,
+      state: req.body.state,
+      LGA: req.body.LGA,
+    };
 
-  const user = await Enumerator.findByIdAndUpdate(
-    req.params.id,
-    newUserDetails,
-    {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
-    }
-  );
+    const user = await Enumerator.findByIdAndUpdate(
+      req.params.id,
+      newUserDetails,
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
 
-  res.status(200).json({
-    success: true,
-    user,
-  });
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // reassign lga to teamLead => api/v1/admin/team_lead/assign_lga/:id
