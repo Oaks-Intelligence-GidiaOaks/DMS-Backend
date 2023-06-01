@@ -466,27 +466,31 @@ export const getOneEnumerator = async (req, res) => {
 
 // Update user details/profile ADMIN => api/v1/admin/user/:id ****
 export const updateUserProfileAdmin = async (req, res) => {
-  const newUserDetails = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    email: req.body.email,
-    phoneNumber: req.body.phoneNumber,
-    id: req.body.id,
-    state: req.body.state,
-    LGA: req.body.LGA,
-    role: req.body.role,
-  };
+  try {
+    const newUserDetails = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      phoneNumber: req.body.phoneNumber,
+      id: req.body.id,
+      state: req.body.state,
+      LGA: req.body.LGA,
+      role: req.body.role,
+    };
 
-  const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
+    const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    });
 
-  res.status(200).json({
-    success: true,
-    user,
-  });
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // Update user details/profile ADMIN => api/v1/admin/user/:id ****
