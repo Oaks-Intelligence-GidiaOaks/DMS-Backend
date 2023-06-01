@@ -299,18 +299,16 @@ export const getAllSubmissionTime = async (req, res) => {
 
         forms.forEach((form) => {
           // Extract the necessary data from the form object
-          const { updated_by, currentWeek, updated_at } = form;
+          const { lga, currentWeek, updated_at } = form;
           const submissionTime = updated_at.toISOString(); // Convert the created_at field to a string in ISO format
 
           // Find the corresponding weekly value object in the array for the enumerator
-          let weeklyValue = weeklyValues.find(
-            (value) => value.updated_by === updated_by
-          );
+          let weeklyValue = weeklyValues.find((value) => value.lga === lga);
 
           // If the weekly value object doesn't exist, create a new one
           if (!weeklyValue) {
             weeklyValue = {
-              updated_by,
+              lga,
               weeklyValues: [],
             };
 
