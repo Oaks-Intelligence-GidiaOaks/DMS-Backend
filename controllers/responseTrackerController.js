@@ -24,12 +24,15 @@ function getWeekNumber(date) {
 const currentWeek = new Date().getWeek();
 
 // get response Tracker api/v1/form_response/response_tracker
-export const getResponseTracker = catchAsyncErrors(async (req, res, next) => {
+export const getResponseTracker = async (req, res) => {
   const { page } = req.query;
 
   const additionalQueryParams = {};
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
@@ -53,69 +56,67 @@ export const getResponseTracker = catchAsyncErrors(async (req, res, next) => {
     let results;
     const totalSubmision = await Form.countDocuments(query);
     const totalEnumerators = await Enumerator.countDocuments({
-      user: req.user._id,
+      LGA: { $in: req.user.LGA },
     });
-    const enumerators = await Enumerator.find({ user: req.user._id }).exec(
-      (err, enumerators) => {
-        if (err) {
-          console.error("Error:", err);
-          // res.status(500).json({ message: err.message });
-        } else {
-          enumeratorIds = enumerators.map((enumerator) => enumerator._id);
+    const enumerators = await Enumerator.find({
+      LGA: { $in: req.user.LGA },
+    }).exec((err, enumerators) => {
+      if (err) {
+        console.error("Error:", err);
+        // res.status(500).json({ message: err.message });
+      } else {
+        enumeratorIds = enumerators.map((enumerator) => enumerator._id);
 
-          //get response
-          const data = Form.find({
-            created_by: { $in: enumeratorIds },
-            $expr: {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
-          }).exec((err, data) => {
-            if (err) {
-              console.error("Error2:", err);
-            } else {
-              // Create a map of enumeratorId to response for easier lookup
-              const responseMap = new Map();
-              data.forEach((response) => {
-                responseMap.set(response.created_by.toString(), response);
-              });
-              // Iterate through the enmerators and determine the status
-              results = enumerators.map((enumerator) => {
-                const response = responseMap.get(enumerator._id.toString());
-                const status = !!response;
-                const state = response ? response.state : null;
-                const lga = response ? response.lga : null;
-                const created_at = response ? response.created_at : null;
-                const form_id = response ? response._id : null;
+        //get response
+        const data = Form.find({
+          created_by: { $in: enumeratorIds },
+          $expr: {
+            $eq: [
+              { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+              currentWeek,
+            ],
+          },
+        }).exec((err, data) => {
+          if (err) {
+            console.error("Error2:", err);
+          } else {
+            // Create a map of enumeratorId to response for easier lookup
+            const responseMap = new Map();
+            data.forEach((response) => {
+              responseMap.set(response.created_by.toString(), response);
+            });
+            // Iterate through the enmerators and determine the status
+            results = enumerators.map((enumerator) => {
+              const response = responseMap.get(enumerator._id.toString());
+              const status = !!response;
+              const state = response ? response.state : null;
+              const lga = response ? response.lga : null;
+              const created_at = response ? response.created_at : null;
+              const form_id = response ? response._id : null;
 
-                return {
-                  first_name: enumerator.firstName,
-                  last_name: enumerator.lastName,
-                  id: enumerator.id,
-                  state,
-                  lga,
-                  created_at,
-                  status,
-                  form_id,
-                };
-              });
-              res
-                .status(200)
-                .json({ results, totalEnumerators, totalSubmision });
-            }
-          });
-        }
+              return {
+                first_name: enumerator.firstName,
+                last_name: enumerator.lastName,
+                id: enumerator.id,
+                state,
+                lga,
+                created_at,
+                status,
+                form_id,
+              };
+            });
+            res.status(200).json({ results, totalEnumerators, totalSubmision });
+          }
+        });
       }
-    );
+    });
 
     // res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 export const approveResponse = async (req, res) => {
   // const session = await mongoose.startSession();
@@ -221,7 +222,11 @@ export const getSubmissionTime = async (req, res) => {
     }
 
     // Query the database for the desired forms
-    Form.find({ team_lead_id: req.user._id })
+    Form.find({
+      lga: {
+        $in: req.user.LGA,
+      },
+    })
       .populate("created_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
         if (err) {

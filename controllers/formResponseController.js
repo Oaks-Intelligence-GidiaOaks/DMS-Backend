@@ -53,7 +53,10 @@ export const getFoodProduct = async (req, res) => {
     additionalQueryParams.price = priceFilter;
   }
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -146,7 +149,10 @@ export const getTransport = async (req, res) => {
     additionalQueryParams.cost = costFilter;
   }
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -238,7 +244,10 @@ export const getAccomodation = async (req, res) => {
     additionalQueryParams.prize = prizeFilter;
   }
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -323,7 +332,10 @@ export const getElectricity = async (req, res) => {
     additionalQueryParams.hours_per_week = hourPerWeekFilter;
   }
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -411,7 +423,10 @@ export const getQuestions = async (req, res) => {
     additionalQueryParams.government_project = governmentProjectFilter;
   }
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -516,7 +531,10 @@ export const getOtherProducts = async (req, res) => {
     additionalQueryParams.price = priceFilter;
   }
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;

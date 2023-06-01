@@ -467,8 +467,8 @@ export const getOneEnumerator = async (req, res) => {
 // Update user details/profile ADMIN => api/v1/admin/user/:id ****
 export const updateUserProfileAdmin = async (req, res) => {
   const newUserDetails = {
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     email: req.body.email,
     phoneNumber: req.body.phoneNumber,
     id: req.body.id,

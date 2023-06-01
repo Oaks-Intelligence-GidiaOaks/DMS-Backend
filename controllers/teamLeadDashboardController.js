@@ -265,9 +265,13 @@ export const getPriceFluctuation = async (req, res) => {
 };
 
 export const getSubmisionRate = async (req, res) => {
+  console.log(req.user.LGA);
   const additionalQueryParams = {};
   if (req?.user?.role === "team_lead") {
-    additionalQueryParams.team_lead_id = req.user._id;
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
   }
   const query = {
     $and: [
@@ -286,7 +290,7 @@ export const getSubmisionRate = async (req, res) => {
   try {
     const totalSubmision = await Form.countDocuments(query);
     const totalEnumerators = await Enumerator.countDocuments({
-      user: req.user._id,
+      LGA: { $in: req.user.LGA },
     });
     const notSubmited = totalEnumerators - totalSubmision;
     res
@@ -300,12 +304,12 @@ export const getSubmisionRate = async (req, res) => {
 export const getEnumeratorsCount = async (req, res) => {
   try {
     const totalEnumerators = await Enumerator.countDocuments({
-      user: req.user._id,
+      LGA: { $in: req.user.LGA },
       disabled: false,
     });
     const newlyAdded = await Enumerator.countDocuments({
       createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-      user: req.user._id,
+      LGA: { $in: req.user.LGA },
     });
     res.status(200).json({ totalEnumerators, newlyAdded });
   } catch (error) {
@@ -360,7 +364,7 @@ export const getYearlyEnumerators = async (req, res) => {
     Enumerator.aggregate([
       {
         $match: {
-          user: req.user._id,
+          LGA: { $in: req.user.LGA },
           created_at: {
             $gte: new Date(currentYear, 0, 1), // Start of the current year
             $lte: new Date(currentYear, 11, 31), // End of the current year
