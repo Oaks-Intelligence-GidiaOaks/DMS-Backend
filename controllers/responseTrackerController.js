@@ -299,7 +299,16 @@ export const getAllSubmissionTime = async (req, res) => {
         }
         // Perform the processing on the forms data here
         const weeklyValues = [];
-
+        // Use reduce() to select only one record for each unique team lead ID
+        // const uniqueRecords = Object.values(
+        //   forms.reduce((acc, obj) => {
+        //     if (!acc[obj.team_lead_id]) {
+        //       acc[obj.team_lead_id] = obj;
+        //     }
+        //     return acc;
+        //   }, {})
+        // );
+        // console.log(uniqueRecords);
         // Loop through the forms array and extract the required information
 
         forms.forEach((form) => {

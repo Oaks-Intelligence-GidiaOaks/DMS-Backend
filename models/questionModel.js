@@ -24,6 +24,7 @@ const questionSchema = new Schema({
   accidents: { type: Boolean, required: true },
   comment_for_accidents: { type: String },
   note: { type: String },
+  team_lead_note: { type: String },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });
