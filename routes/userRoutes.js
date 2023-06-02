@@ -21,13 +21,18 @@ import {
   assignLga,
   updateEnumeratorProfileAdmin,
   getAllTeamLeadEnumerators,
+  getEnumeratorProfile,
 } from "../controllers/userController.js";
-import { isAuthenticatedUser, authorizeRoles } from "../middlewares/auth.js";
+import {
+  isAuthenticatedUser,
+  authorizeRoles,
+  isAuthenticatedEnumerator,
+} from "../middlewares/auth.js";
 
 const router = express.Router();
 
 router.post("/user/new", createUser);
-router.post("/enumerator/new", isAuthenticatedUser, createEnumerator);
+router.post("/enumerator/new", isAuthenticatedEnumerator, createEnumerator);
 router.post("/login", loginUser);
 
 router.post("/password/forgot", forgotPassword);
@@ -36,6 +41,7 @@ router.put("/password/reset/:token", resetPassword);
 router.get("/logout", logoutUser);
 
 router.get("/me", isAuthenticatedUser, getUserProfile);
+router.get("/enumerator/me", isAuthenticatedUser, getEnumeratorProfile);
 router.put("/me/update", isAuthenticatedUser, updateUserProfile);
 router.put("/password/update", isAuthenticatedUser, updatePassword);
 
