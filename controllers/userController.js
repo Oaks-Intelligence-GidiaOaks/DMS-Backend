@@ -109,7 +109,7 @@ export const createEnumerator = async (req, res) => {
     const enumerator = await Enumerator.findOne({ email });
 
     if (enumerator) {
-      res.status(409).json({
+      return res.status(409).json({
         success: false,
         message: `Enumerator already exists`,
       });
@@ -252,7 +252,7 @@ export const forgotPassword = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
 
   if (!user) {
-    res.status(404).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" });
   }
 
   // Get reset password token
