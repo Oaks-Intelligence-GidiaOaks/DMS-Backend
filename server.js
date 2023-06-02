@@ -54,7 +54,7 @@ const corsOptions = {
 // middlewares
 app.use(cookieParser());
 app.use(express.json());
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(fileUpload());
 
 // Setting up cloudinary configuration
