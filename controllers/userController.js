@@ -24,7 +24,7 @@ export const createUser = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "User already exists",
       });
     }
@@ -203,13 +203,13 @@ export const loginUser = async (req, res) => {
     if (user) {
       // return eror if user/enumerator dont exist in db
       if (!user) {
-        res.status(401).json({
+        return res.status(401).json({
           message: "Invalid Id or password, please try again",
         });
       }
 
       if (user.disabled) {
-        res.status(401).json({
+        return res.status(401).json({
           message:
             "Your account has been disabled. Please contact the administrator for assistance",
         });
@@ -224,13 +224,13 @@ export const loginUser = async (req, res) => {
       const enumerator = await Enumerator.findOne({ id }).select("+password");
 
       if (!enumerator) {
-        res.status(401).json({
+        return res.status(401).json({
           message: "Invalid Id or password, please try again",
         });
       }
 
       if (enumerator.disabled) {
-        res.status(401).json({
+        return res.status(401).json({
           message:
             "Your account has been disabled. Please contact the administrator for assistance",
         });
