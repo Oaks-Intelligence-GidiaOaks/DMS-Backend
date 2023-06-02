@@ -474,6 +474,7 @@ export const updateQuestions = async (req, res) => {
       accidents,
       comment_for_accidents,
       note,
+      team_lead_note,
     } = req.body;
     await Question.findByIdAndUpdate(
       { _id: id },
@@ -485,6 +486,7 @@ export const updateQuestions = async (req, res) => {
         accidents,
         comment_for_accidents,
         note,
+        team_lead_note,
         updated_by: req.user._id,
       }
     );
