@@ -81,7 +81,7 @@ router.put(
   updateEnumeratorProfileAdmin
 );
 router.put(
-  "/admin/user/:id",
+  "/admin/user/disable/:id",
   isAuthenticatedUser,
   authorizeRoles("super_admin"),
   disableUser
