@@ -65,19 +65,19 @@ export const createUser = async (req, res) => {
     });
 
     // send password to user email address
-    if (newUser) {
-      try {
-        sendEmail({
-          email,
-          subject: "Gidiaoks DCF Password",
-          message: `Please sign in to DCF with this password: ${id}. Cheers!`,
-        });
-      } catch (error) {
-        res.status(400).json({
-          message: error.message,
-        });
-      }
-    }
+    // if (newUser) {
+    //   try {
+    //     sendEmail({
+    //       email,
+    //       subject: "Gidiaoks DCF Password",
+    //       message: `Please sign in to DCF with this password: ${id}. Cheers!`,
+    //     });
+    //   } catch (error) {
+    //     res.status(400).json({
+    //       message: error.message,
+    //     });
+    //   }
+    // }
 
     // sendToken(newUser, 200, res);
     res.status(200).json({
@@ -163,17 +163,17 @@ export const createEnumerator = async (req, res) => {
     await user.save();
 
     // send password to user email address
-    if (newEnumerator) {
-      try {
-        sendEmail({
-          email,
-          subject: "Gidiaoks DCF Password",
-          message: `Please sign in to DCF with this password: ${password}. Cheers!`,
-        });
-      } catch (error) {
-        res.status(500).json({ error });
-      }
-    }
+    // if (newEnumerator) {
+    //   try {
+    //     sendEmail({
+    //       email,
+    //       subject: "Gidiaoks DCF Password",
+    //       message: `Please sign in to DCF with this password: ${password}. Cheers!`,
+    //     });
+    //   } catch (error) {
+    //     res.status(500).json({ error });
+    //   }
+    // }
     // sendToken(newEnumerator, 200, res);
 
     res.status(200).json({
@@ -421,6 +421,7 @@ export const getAllEnumerators = async (req, res, next) => {
   const query = {};
   if (req?.user?.role === "team_lead") {
     query.user = req.user._id;
+    query.disabled = false;
   }
   const enumerators = await Enumerator.find(query);
   const totalEnumerators = await Enumerator.countDocuments({
