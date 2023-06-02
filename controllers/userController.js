@@ -417,7 +417,7 @@ export const getAllTeamLead = async (req, res) => {
 };
 
 // Get all enumerators api/v1/enumerators
-export const getAllEnumerators = async (req, res, next) => {
+export const getAllEnumerators = async (req, res) => {
   const query = {};
   if (req?.user?.role === "team_lead") {
     query.user = req.user._id;
@@ -438,6 +438,20 @@ export const getAllEnumerators = async (req, res, next) => {
     enumerators,
     totalEnumerators,
     newlyAdded,
+  });
+};
+// Get all enumerators api/v1/enumerators
+export const getAllTeamLeadEnumerators = async (req, res) => {
+  const query = {};
+  // if (req?.user?.role === "team_lead") {
+  //   query.user = req.user._id;
+  //   query.disabled = false;
+  // }
+  const enumerators = await Enumerator.find({ team_lead_id: req.params.id });
+
+  res.status(200).json({
+    message: "success",
+    enumerators,
   });
 };
 
@@ -577,24 +591,28 @@ export const disableEnumerator = async (req, res) => {
 
 // Disable user ADMIN => api/v1/admin/enumerator/:id/disable ****
 export const disableUser = async (req, res) => {
-  const user = await User.findByIdAndUpdate(
-    req.params.id,
-    { disabled: true },
-    {
-      new: true,
-      runValidators: true,
-      useFindAndModify: false,
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { disabled: true },
+      {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+      }
+    );
+
+    if (!user) {
+      return next(new ErrorHandler(`User with id ${req.params.id} not found`));
     }
-  );
 
-  if (!user) {
-    return next(new ErrorHandler(`User with id ${req.params.id} not found`));
+    res.status(200).json({
+      success: true,
+      message: "user disabled",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  res.status(200).json({
-    success: true,
-    message: "user disabled",
-  });
 };
 
 // Seed super admin => api/v1/seed
