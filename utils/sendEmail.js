@@ -9,23 +9,25 @@ const sendEmail = async (options) => {
   //     pass: process.env.SMTP_PASSWORD,
   //   },
   // });
-  const transporter = nodemailer.createTransport({
-    type: "OAuth2",
-    user: process.env.MAIL_USER,
-    clientId: process.env.MY_CLIENT_ID,
-    clientSecret: process.env.MY_CLIENT_SECRET,
-    refreshToken: process.env.REFRESH_TOKEN,
-    accessToken: process.env.ACCESS_TOKEN
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      type: "OAuth2",
+      user: process.env.MAIL_USER,
+      clientId: process.env.MY_CLIENT_ID,
+      clientSecret: process.env.MY_CLIENT_SECRET,
+      refreshToken: process.env.REFRESH_TOKEN,
+      accessToken: process.env.ACCESS_TOKEN,
+    });
 
-  const message = {
-    from: process.env.MAIL_USER,
-    to: options.email,
-    subject: options.subject,
-    text: options.message,
-  };
+    const message = {
+      from: process.env.MAIL_USER,
+      to: options.email,
+      subject: options.subject,
+      text: options.message,
+    };
 
-  await transporter.sendMail(message);
+    await transporter.sendMail(message);
+  } catch (error) {}
 };
 
 export default sendEmail;
