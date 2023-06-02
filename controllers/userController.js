@@ -321,7 +321,7 @@ export const resetPassword = async (req, res) => {
 // Get currently logged in user profile => api/v1/me ****
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user._id);
 
     if (user.disabled) {
       return res.status(401).json({
@@ -342,7 +342,7 @@ export const getUserProfile = async (req, res) => {
 // Get currently logged in enumerator profile => api/v1/me ****
 export const getEnumeratorProfile = async (req, res) => {
   try {
-    const user = await Enumerator.findById(req.enumerator.id);
+    const user = await Enumerator.findById(req.enumerator._id);
 
     if (user.disabled) {
       return res.status(401).json({
