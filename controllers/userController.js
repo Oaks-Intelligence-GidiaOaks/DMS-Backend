@@ -628,7 +628,9 @@ export const disableUser = async (req, res) => {
     );
 
     if (!user) {
-      return next(new ErrorHandler(`User with id ${req.params.id} not found`));
+      return res
+        .status(401)
+        .json({ message: `User with id ${req.params.id} not found` }); //next(new ErrorHandler(`User with id ${req.params.id} not found`));
     }
 
     res.status(200).json({
