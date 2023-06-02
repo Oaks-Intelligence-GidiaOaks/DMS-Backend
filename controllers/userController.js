@@ -320,19 +320,44 @@ export const resetPassword = async (req, res) => {
 
 // Get currently logged in user profile => api/v1/me ****
 export const getUserProfile = async (req, res) => {
-  const user = await User.findById(req.user.id);
+  try {
+    const user = await User.findById(req.user.id);
 
-  if (user.disabled) {
-    new ErrorHandler(
-      "Your account has been disabled. Please contact the administrator for assistance",
-      401
-    );
+    if (user.disabled) {
+      return res.status(401).json({
+        message:
+          "Your account has been disabled. Please contact the administrator for assistance",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+};
 
-  res.status(200).json({
-    success: true,
-    user,
-  });
+// Get currently logged in enumerator profile => api/v1/me ****
+export const getEnumeratorProfile = async (req, res) => {
+  try {
+    const user = await Enumerator.findById(req.enumerator.id);
+
+    if (user.disabled) {
+      return res.status(401).json({
+        message:
+          "Your account has been disabled. Please contact the administrator for assistance",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // Update password => api/v1/password/update ****
