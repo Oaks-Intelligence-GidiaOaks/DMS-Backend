@@ -33,6 +33,7 @@ export const getResponseTracker = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {

@@ -57,6 +57,7 @@ export const getFoodProduct = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -153,6 +154,7 @@ export const getTransport = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -248,6 +250,7 @@ export const getAccomodation = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -336,6 +339,7 @@ export const getElectricity = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -427,6 +431,7 @@ export const getQuestions = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
@@ -537,6 +542,7 @@ export const getOtherProducts = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
