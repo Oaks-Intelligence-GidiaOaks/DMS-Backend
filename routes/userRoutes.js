@@ -96,7 +96,7 @@ router.get(
 router.put(
   "/admin/user/disable/:id",
   isAuthenticatedUser,
-  authorizeRoles("super_admin"),
+  authorizeRoles("super_admin", "admin"),
   disableUser
 );
 router.put(
