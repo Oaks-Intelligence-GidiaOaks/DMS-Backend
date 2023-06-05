@@ -51,6 +51,10 @@ const userSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  firstUse: {
+    type: Boolean,
+    default: true,
+  },
   role: {
     type: String,
     default: "team_lead",

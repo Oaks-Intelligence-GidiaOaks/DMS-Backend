@@ -11,6 +11,7 @@ import {
   logoutUser,
   resetPassword,
   updatePassword,
+  updateEnumeratorPassword,
   updateUserProfile,
   updateUserProfileAdmin,
   disableUser,
@@ -44,6 +45,11 @@ router.get("/me", isAuthenticatedUser, getUserProfile);
 router.get("/enumerator/me", isAuthenticatedEnumerator, getEnumeratorProfile);
 router.put("/me/update", isAuthenticatedUser, updateUserProfile);
 router.put("/password/update", isAuthenticatedUser, updatePassword);
+router.put(
+  "/password/update/enumerator",
+  isAuthenticatedEnumerator,
+  updateEnumeratorPassword
+);
 
 router.get(
   "/admin/users",

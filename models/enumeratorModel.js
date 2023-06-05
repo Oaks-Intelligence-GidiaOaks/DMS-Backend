@@ -74,6 +74,10 @@ const EnumeratorSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  firstUse: {
+    type: Boolean,
+    default: true,
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

@@ -6,9 +6,8 @@ const currentWeek = new Date().getWeek();
 
 export const getMasterListData = async (req, res) => {
   try {
-    const { weekFilter = "" } = req.query;
+    const { weekFilter = 0 } = req.query;
     const additionalQueryParams = {};
-
     if (req?.user?.role === "team_lead") {
       additionalQueryParams.team_lead_id = req.user._id;
     }
@@ -16,7 +15,6 @@ export const getMasterListData = async (req, res) => {
     if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
       additionalQueryParams.approved = 1;
     }
-
     const query = {
       $and: [
         {
