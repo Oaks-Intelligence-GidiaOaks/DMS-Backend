@@ -362,18 +362,63 @@ export const getEnumeratorProfile = async (req, res) => {
 
 // Update password => api/v1/password/update ****
 export const updatePassword = async (req, res) => {
-  const user = await User.findById(req.user.id).select("+password");
+  try {
+    const { oldPassword, password, confirmPassword } = req.body;
 
-  // Verify old password is correct
-  const VerifyPassword = await user.isPasswordMatch(req.body.oldPassword);
+    const user = await User.findById(req.user._id).select("+password");
 
-  if (!VerifyPassword) {
-    return next(new ErrorHandler("Old password does not match", 400));
+    if (!user) {
+      return res.status(401).json({
+        message: "Invalid user, please try again",
+      });
+    }
+    // Verify old password is correct
+    const VerifyPassword = await user.isPasswordMatch(oldPassword);
+
+    if (!VerifyPassword) {
+      return res.status(401).json({ message: "old password do not match" });
+    }
+    if (password === confirmPassword) {
+      return res.status(401).json({ message: "password do not match" });
+    }
+    user.password = password;
+    user.firstUse = false;
+    await user.save();
+    res.status(200).json({ mesaage: "password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
+};
 
-  user.password = req.body.newPassword;
-  await user.save();
-  sendToken(user, 200, res);
+// Update password => api/v1/password/update ****
+export const updateEnumeratorPassword = async (req, res) => {
+  try {
+    const { oldPassword, password, confirmPassword } = req.body;
+
+    const enumerator = await Enumerator.findById(req.enumerator._id).select(
+      "+password"
+    );
+
+    if (!enumerator) {
+      return res.status(401).json({
+        message: "Invalid user, please try again",
+      });
+    }
+    const VerifyPassword = await enumerator.isPasswordMatch(oldPassword);
+
+    if (!VerifyPassword) {
+      return res.status(401).json({ message: "old password do not match" });
+    }
+    if (password === confirmPassword) {
+      return res.status(401).json({ message: "password do not match" });
+    }
+    enumerator.password = password;
+    enumerator.firstUse = false;
+    await enumerator.save();
+    res.status(200).json({ mesaage: "password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 // Update user details/profile => api/v1/me/update ****
@@ -445,17 +490,23 @@ export const getAllTeamLead = async (req, res) => {
 export const getAllEnumerators = async (req, res) => {
   const query = {};
   if (req?.user?.role === "team_lead") {
-    query.user = req.user._id;
+    query.LGA = {
+      $in: req.user.LGA,
+    };
     query.disabled = false;
   }
   const enumerators = await Enumerator.find(query);
   const totalEnumerators = await Enumerator.countDocuments({
-    user: req.user._id,
+    LGA: {
+      $in: req.user.LGA,
+    },
     disabled: false,
   });
   const newlyAdded = await Enumerator.countDocuments({
     createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-    user: req.user._id,
+    LGA: {
+      $in: req.user.LGA,
+    },
   });
 
   res.status(200).json({
@@ -472,7 +523,12 @@ export const getAllTeamLeadEnumerators = async (req, res) => {
   //   query.user = req.user._id;
   //   query.disabled = false;
   // }
-  const enumerators = await Enumerator.find({ team_lead_id: req.params.id });
+  const teamLead = await User.findById(req.params._id);
+  const enumerators = await Enumerator.find({
+    LGA: {
+      $in: teamLead.LGA,
+    },
+  });
 
   res.status(200).json({
     message: "success",
