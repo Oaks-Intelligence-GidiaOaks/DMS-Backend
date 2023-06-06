@@ -84,7 +84,7 @@ router.get(
 router.put(
   "/admin/user/:id",
   isAuthenticatedUser,
-  authorizeRoles("super_admin"),
+  authorizeRoles("super_admin, admin"),
   updateUserProfileAdmin
 );
 router.put(
