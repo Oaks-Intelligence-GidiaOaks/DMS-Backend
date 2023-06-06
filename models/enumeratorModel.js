@@ -60,7 +60,7 @@ const EnumeratorSchema = new Schema({
     type: String,
     default: "enumerator",
   },
-  state: {
+  states: {
     type: String,
     required: true,
   },

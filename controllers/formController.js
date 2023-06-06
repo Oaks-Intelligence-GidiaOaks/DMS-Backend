@@ -215,3 +215,18 @@ export const getFormData = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler(error.message, 500));
   }
 });
+
+export const clearDb = async (req, res) => {
+  try {
+    await Form.deleteMany({});
+    await Product.deleteMany({});
+    await Accomodation.deleteMany({});
+    await OtherProduct.deleteMany({});
+    await Electricity.deleteMany({});
+    await Transport.deleteMany({});
+    await Question.deleteMany({});
+    res.status(200).json({ message: "form data cleared cleared" });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
+};

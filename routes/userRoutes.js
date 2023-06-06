@@ -23,6 +23,7 @@ import {
   updateEnumeratorProfileAdmin,
   getAllTeamLeadEnumerators,
   getEnumeratorProfile,
+  // clearDb,
 } from "../controllers/userController.js";
 import {
   isAuthenticatedUser,
@@ -72,19 +73,19 @@ router.get(
 router.get(
   "/admin/user/:id",
   isAuthenticatedUser,
-  authorizeRoles("super_admin"),
+  authorizeRoles("super_admin", "admin"),
   getOneUser
 );
 router.get(
   "/admin/enumerator/:id",
   isAuthenticatedUser,
-  authorizeRoles("super_admin"),
+  authorizeRoles("super_admin", "admin", "team_lead"),
   getOneEnumerator
 );
 router.put(
   "/admin/user/:id",
   isAuthenticatedUser,
-  authorizeRoles("super_admin"),
+  authorizeRoles("super_admin", "admin"),
   updateUserProfileAdmin
 );
 router.put(
@@ -119,5 +120,6 @@ router.put(
 );
 
 router.post("/seed", seedSuperAdmin);
+// router.delete("/clear_db", clearDb);
 
 export default router;

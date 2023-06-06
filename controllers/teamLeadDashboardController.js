@@ -329,7 +329,7 @@ export const getLGACount = (req, res) => {
       });
     }
     let totalLga = 0;
-    req.user.state.forEach((state) => {
+    req.user.states.forEach((state) => {
       stateCounts.map((item) => {
         if (item.state === state) {
           totalLga += item.lgaCount;
