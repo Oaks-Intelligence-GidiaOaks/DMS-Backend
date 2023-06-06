@@ -528,7 +528,7 @@ export const getAllTeamLeadEnumerators = async (req, res) => {
     //   query.user = req.user._id;
     //   query.disabled = false;
     // }
-    const teamLead = await User.findById(req.params._id);
+    const teamLead = await User.findById(req.params.id);
     const enumerators = await Enumerator.find({
       LGA: {
         $in: teamLead.LGA,
