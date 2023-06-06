@@ -6,6 +6,7 @@ import Accomodation from "../models/accomodationModel.js";
 import Electricity from "../models/electricityModel.js";
 import Transport from "../models/transportModel.js";
 import Question from "../models/questionModel.js";
+import Clothing from "../models/clothingModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import "../utils/dateUtils.js";
@@ -26,6 +27,7 @@ export const addFormData = async (req, res) => {
       questions,
       others,
       lga,
+      clothings,
     } = req.body;
     // validate here
 
@@ -172,6 +174,27 @@ export const addFormData = async (req, res) => {
         })
       );
 
+      // clothing
+      let clothing_ids = await Promise.all(
+        clothings.map(async (item, index) => {
+          const { category, sub_category, size, price } = item;
+
+          let newClothing = await new Clothing({
+            created_by: req.enumerator._id,
+            region: req.enumerator?.region,
+            state: req.enumerator.state,
+            team_lead_id: req.enumerator.user,
+            lga: lga ? lga : req.enumerator.LGA[0],
+            category,
+            sub_category,
+            size,
+            price,
+          }).save();
+
+          return newClothing._id;
+        })
+      );
+
       // parent entry
       const newEntry = await new Form({
         created_by: req.enumerator._id,
@@ -185,6 +208,7 @@ export const addFormData = async (req, res) => {
         electricity: electricity_ids,
         others: other_product_ids,
         questions: questions_ids,
+        clothings: clothing_ids,
         // created_at: new Date().toISOString(),
       }).save();
 
