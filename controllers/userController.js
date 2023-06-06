@@ -488,52 +488,60 @@ export const getAllTeamLead = async (req, res) => {
 
 // Get all enumerators api/v1/enumerators
 export const getAllEnumerators = async (req, res) => {
-  const query = {};
-  if (req?.user?.role === "team_lead") {
-    query.LGA = {
-      $in: req.user.LGA,
-    };
-    query.disabled = false;
-  }
-  const enumerators = await Enumerator.find(query);
-  const totalEnumerators = await Enumerator.countDocuments({
-    LGA: {
-      $in: req.user.LGA,
-    },
-    disabled: false,
-  });
-  const newlyAdded = await Enumerator.countDocuments({
-    createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-    LGA: {
-      $in: req.user.LGA,
-    },
-  });
+  try {
+    const query = {};
+    if (req?.user?.role === "team_lead") {
+      query.LGA = {
+        $in: req.user.LGA,
+      };
+      query.disabled = false;
+    }
+    const enumerators = await Enumerator.find(query);
+    const totalEnumerators = await Enumerator.countDocuments({
+      LGA: {
+        $in: req.user.LGA,
+      },
+      disabled: false,
+    });
+    const newlyAdded = await Enumerator.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+      LGA: {
+        $in: req.user.LGA,
+      },
+    });
 
-  res.status(200).json({
-    message: "success",
-    enumerators,
-    totalEnumerators,
-    newlyAdded,
-  });
+    res.status(200).json({
+      message: "success",
+      enumerators,
+      totalEnumerators,
+      newlyAdded,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
 };
 // Get all enumerators api/v1/enumerators
 export const getAllTeamLeadEnumerators = async (req, res) => {
-  const query = {};
-  // if (req?.user?.role === "team_lead") {
-  //   query.user = req.user._id;
-  //   query.disabled = false;
-  // }
-  const teamLead = await User.findById(req.params._id);
-  const enumerators = await Enumerator.find({
-    LGA: {
-      $in: teamLead.LGA,
-    },
-  });
+  try {
+    const query = {};
+    // if (req?.user?.role === "team_lead") {
+    //   query.user = req.user._id;
+    //   query.disabled = false;
+    // }
+    const teamLead = await User.findById(req.params._id);
+    const enumerators = await Enumerator.find({
+      LGA: {
+        $in: teamLead.LGA,
+      },
+    });
 
-  res.status(200).json({
-    message: "success",
-    enumerators,
-  });
+    res.status(200).json({
+      message: "success",
+      enumerators,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
 };
 
 // Get specific user => api/v1/admin/users/:id ****
