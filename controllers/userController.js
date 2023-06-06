@@ -20,7 +20,7 @@ const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 // Create team lead/admin api/v1/user/new ****
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, state, LGA } = req.body;
+    const { firstName, lastName, email, role, states, LGA } = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
@@ -60,7 +60,7 @@ export const createUser = async (req, res) => {
         public_id: "resultUserAvarter.public_id",
         url: "resultUserAvarter.secure_url",
       },
-      state,
+      states,
       LGA,
     });
 
@@ -102,7 +102,7 @@ export const createEnumerator = async (req, res) => {
       phoneNumber,
       identityType,
       identity,
-      state,
+      states,
       LGA,
     } = req.body;
 
@@ -153,7 +153,7 @@ export const createEnumerator = async (req, res) => {
         public_id: "resultUserAvarter.public_id",
         url: "resultUserAvarter.secure_url",
       },
-      state,
+      states,
       LGA,
       user: req.user._id,
     });
@@ -429,7 +429,7 @@ export const updateUserProfile = async (req, res) => {
     email: req.body.email,
     phoneNumber: req.body.phoneNumber,
     id: req.body.id,
-    state: req.body.state,
+    states: req.body.states,
     LGA: req.body.LGA,
   };
 
@@ -579,7 +579,7 @@ export const updateUserProfileAdmin = async (req, res) => {
       email: req.body.email,
       phoneNumber: req.body.phoneNumber,
       id: req.body.id,
-      state: req.body.state,
+      states: req.body.states,
       LGA: req.body.LGA,
       role: req.body.role,
     };
@@ -608,7 +608,7 @@ export const updateEnumeratorProfileAdmin = async (req, res) => {
       email: req.body.email,
       phoneNumber: req.body.phoneNumber,
       id: req.body.id,
-      state: req.body.state,
+      states: req.body.states,
       LGA: req.body.LGA,
     };
 
@@ -728,4 +728,14 @@ export const seedSuperAdmin = async (req, res) => {
   // }
 
   //
+};
+
+export const clearDb = async (req, res) => {
+  try {
+    await User.deleteMany({});
+    await Enumerator.deleteMany({});
+    res.status(200).json({ message: "users and enumerators cleared" });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
 };

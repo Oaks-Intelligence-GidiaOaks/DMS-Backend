@@ -42,7 +42,7 @@ const userSchema = new Schema({
       type: String,
     },
   },
-  state: [
+  states: [
     {
       type: String,
     },
