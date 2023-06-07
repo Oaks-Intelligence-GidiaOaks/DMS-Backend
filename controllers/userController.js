@@ -20,7 +20,7 @@ const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 // Create team lead/admin api/v1/user/new ****
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, states, LGA } = req.body;
+    const { firstName, lastName, email, role, states, LGA} = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
@@ -40,22 +40,22 @@ export const createUser = async (req, res) => {
       id = generateId();
     }
 
-    let resultUserAvarter;
-    try {
-      resultUserAvarter = await cloudinary.v2.uploader.upload(
-        req.body.avarter,
-        {
-          folder: "avarters",
-          width: 150,
-          crop: "scale",
-        }
-      );
-    } catch (error) {
-      return res.status(400).json({
-        message: error.mesaage,
-      });
-      // throw new Error(error.message);
-    }
+    // let resultUserAvatar;
+    // try {
+    //   resultUserAvatar = await cloudinary.v2.uploader.upload(
+    //     avatar,
+    //     {
+    //       folder: "avarters",
+    //       width: 150,
+    //       crop: "scale",
+    //     }
+    //   );
+    // } catch (error) {
+    //   return res.status(400).json({
+    //     message: error.mesaage,
+    //   });
+    //   // throw new Error(error.message);
+    // }
 
     const newUser = await User.create({
       id,
@@ -64,9 +64,9 @@ export const createUser = async (req, res) => {
       email,
       role,
       password: "123456",
-      avarter: {
-        public_id: resultUserAvarter.public_id,
-        url: resultUserAvarter.secure_url,
+      avatar: {
+        public_id: "resultUserAvatar.public_id",
+        url: "resultUserAvatar.secure_url",
       },
       states,
       LGA,

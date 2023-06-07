@@ -25,6 +25,7 @@ const userSchema = new Schema({
   },
   id: {
     type: String,
+    minlenght: [8, "id must be at least 8 characters"],
     required: [true, "please enter your id"],
     unique: true,
   },
@@ -34,7 +35,7 @@ const userSchema = new Schema({
     minlenght: [6, "Password must be at least 6 characters"],
     select: false,
   },
-  avarter: {
+  avatar: {
     public_id: {
       type: String,
     },
