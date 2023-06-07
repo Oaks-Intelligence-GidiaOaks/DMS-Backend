@@ -102,7 +102,7 @@ export const createEnumerator = async (req, res) => {
       phoneNumber,
       identityType,
       identity,
-      states,
+      state,
       LGA,
     } = req.body;
 
@@ -153,7 +153,7 @@ export const createEnumerator = async (req, res) => {
         public_id: "resultUserAvarter.public_id",
         url: "resultUserAvarter.secure_url",
       },
-      states,
+      state,
       LGA,
       user: req.user._id,
     });
@@ -616,7 +616,7 @@ export const updateEnumeratorProfileAdmin = async (req, res) => {
       email: req.body.email,
       phoneNumber: req.body.phoneNumber,
       id: req.body.id,
-      states: req.body.states,
+      state: req.body.state,
       LGA: req.body.LGA,
     };
 

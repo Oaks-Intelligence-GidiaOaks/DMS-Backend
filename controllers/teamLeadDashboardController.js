@@ -360,12 +360,11 @@ export const getYearlyEnumerators = async (req, res) => {
       "November",
       "December",
     ];
-
     Enumerator.aggregate([
       {
         $match: {
           LGA: { $in: req.user.LGA },
-          created_at: {
+          createdAt: {
             $gte: new Date(currentYear, 0, 1), // Start of the current year
             $lte: new Date(currentYear, 11, 31), // End of the current year
           },
@@ -376,7 +375,7 @@ export const getYearlyEnumerators = async (req, res) => {
           _id: {
             $dateToString: {
               format: "%m-%Y",
-              date: "$created_at",
+              date: "$createdAt",
             },
           },
           added: {
