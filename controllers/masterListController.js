@@ -9,7 +9,9 @@ export const getMasterListData = async (req, res) => {
     const { weekFilter = 0 } = req.query;
     const additionalQueryParams = {};
     if (req?.user?.role === "team_lead") {
-      additionalQueryParams.team_lead_id = req.user._id;
+      additionalQueryParams.lga = {
+        $in: req.user.LGA,
+      };
     }
 
     if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
@@ -21,13 +23,14 @@ export const getMasterListData = async (req, res) => {
           $expr: {
             $eq: [
               { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-              weekFilter ? weekFilter : currentWeek,
+              weekFilter ? parseInt(weekFilter) : currentWeek,
             ],
           },
         },
         additionalQueryParams,
       ],
     };
+
     // Query the database for the desired forms
     Form.find(query)
       .sort({ created_at: -1 }) // Sort by created_at in descending order
@@ -36,6 +39,7 @@ export const getMasterListData = async (req, res) => {
       .populate("transports", "route mode cost") // Populate transports and select the name, mode, and cost fields
       .populate("electricity", "hours_per_week") // Populate electricity and select the name, type, and voltage fields
       .populate("others", "name brand price") // Populate electricity and select the name, type, and voltage fields
+      .populate("clothings", "category sub_category size price") // Populate electricity and select the name, type, and voltage fields
       .populate(
         "questions",
         "government_project comment_for_government_project crime_report comment_for_crime_report accidents comment_for_accidents note"

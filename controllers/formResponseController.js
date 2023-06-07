@@ -6,6 +6,7 @@ import Accomodation from "../models/accomodationModel.js";
 import Electricity from "../models/electricityModel.js";
 import Transport from "../models/transportModel.js";
 import Question from "../models/questionModel.js";
+import Clothing from "../models/clothingModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import APIQueries from "../utils/apiQueries.js";
@@ -109,6 +110,107 @@ export const updateFoodProduct = async (req, res) => {
     );
 
     res.status(200).json({ message: "Food Product updated sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// get food product api/v1/form_response/clothings
+export const getClothingProduct = async (req, res) => {
+  const {
+    searchQuery = "",
+    regionFilter = "",
+    stateFilter = "",
+    lgaFilter = "",
+    categoryFilter = "",
+    subCategoryFilter = "",
+    sizeFilter = "",
+    priceFilter = "",
+    page,
+  } = req.query;
+
+  const additionalQueryParams = {};
+  if (regionFilter !== "") {
+    additionalQueryParams.region = regionFilter;
+  }
+  if (stateFilter !== "") {
+    additionalQueryParams.state = stateFilter;
+  }
+  if (lgaFilter !== "") {
+    additionalQueryParams.lga = lgaFilter;
+  }
+  if (regionFilter !== "") {
+    additionalQueryParams.region = regionFilter;
+  }
+  if (categoryFilter !== "") {
+    additionalQueryParams.category = categoryFilter;
+  }
+  if (sizeFilter !== "") {
+    additionalQueryParams.size = sizeFilter;
+  }
+  if (subCategoryFilter !== "") {
+    additionalQueryParams.sub_category = subCategoryFilter;
+  }
+  if (priceFilter !== "") {
+    additionalQueryParams.price = priceFilter;
+  }
+  if (req?.user?.role === "team_lead") {
+    // additionalQueryParams.team_lead_id = req.user._id;
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  const currentPage = page || 1;
+  const skip = (currentPage - 1) * 10;
+
+  try {
+    const totalCount = await Clothing.countDocuments(query);
+    const data = await Clothing.find(query).populate({
+      path: "created_by",
+    });
+    // .skip(skip)
+    // .limit(20);
+
+    res.status(200).json({ data, totalCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//update food product api/v1/form_response/clothings/id
+export const updateClothingProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { category, price, sub_category, size } = req.body;
+    await Clothing.findByIdAndUpdate(
+      { _id: id },
+      {
+        category,
+        sub_category,
+        size,
+        price,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "Clothing Product updated sucessfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

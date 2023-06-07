@@ -53,6 +53,12 @@ const FormSchema = new Schema({
       ref: "Question",
     },
   ],
+  clothings: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Clothing",
+    },
+  ],
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });
