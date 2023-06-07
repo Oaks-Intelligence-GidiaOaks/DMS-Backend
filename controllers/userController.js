@@ -131,7 +131,7 @@ export const createEnumerator = async (req, res) => {
     const password = 123456;
     console.log(password, "**pass");
 
-    const resultUserAvarter = await cloudinary.v2.uploader.upload(
+    const resultIdentityImage = await cloudinary.v2.uploader.upload(
       req.body.avarter,
       {
         folder: "avarters",
@@ -150,8 +150,8 @@ export const createEnumerator = async (req, res) => {
       identityType,
       identity,
       identityImage: {
-        public_id: resultUserAvarter.public_id,
-        url: resultUserAvarter.secure_url,
+        public_id: resultIdentityImage.public_id,
+        url: resultIdentityImage.secure_url,
       },
       state,
       LGA,
