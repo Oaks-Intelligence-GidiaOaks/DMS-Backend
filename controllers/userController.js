@@ -642,14 +642,17 @@ export const updateEnumeratorProfileAdmin = async (req, res) => {
 // reassign lga to teamLead => api/v1/admin/team_lead/assign_lga/:id
 export const assignLga = async (req, res) => {
   try {
-    const { lga } = req.body;
+    const { lga, states } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) {
       res.status(401).json({ message: "User not found" });
     }
-    lga.map((item) => {
-      user.LGA.push(item);
-    });
+    user.LGA = lga;
+    user.states = states;
+    await user.save();
+    // lga.map((item) => {
+    //   user.LGA.push(item);
+    // });
     res.status(200).json({ message: "user LGA assigned successfully", User });
   } catch (error) {
     res.status(500).json({ message: error.message });
