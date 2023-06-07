@@ -139,14 +139,14 @@ export const createEnumerator = async (req, res) => {
     const password = 123456;
     console.log(password, "**pass");
 
-    const resultIdentityImage = await cloudinary.v2.uploader.upload(
-      req.body.avarter,
-      {
-        folder: "avarters",
-        width: 150,
-        crop: "scale",
-      }
-    );
+    // const resultIdentityImage = await cloudinary.v2.uploader.upload(
+    //   req.body.avarter,
+    //   {
+    //     folder: "avarters",
+    //     width: 150,
+    //     crop: "scale",
+    //   }
+    // );
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
       firstName,
@@ -158,8 +158,8 @@ export const createEnumerator = async (req, res) => {
       identityType,
       identity,
       identityImage: {
-        public_id: resultIdentityImage.public_id,
-        url: resultIdentityImage.secure_url,
+        public_id: "resultIdentityImage.public_id",
+        url: "resultIdentityImage.secure_url",
       },
       state,
       LGA,
