@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 import Form from "../models/formModel.js";
 import Enumerator from "../models/enumeratorModel.js";
+import User from "../models/userModel.js";
 import Product from "../models/productModel.js";
 import OtherProduct from "../models/otherProductsModel.js";
 import Accomodation from "../models/accomodationModel.js";
 import Electricity from "../models/electricityModel.js";
 import Transport from "../models/transportModel.js";
 import Question from "../models/questionModel.js";
+import Clothing from "../models/clothingModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import APIQueries from "../utils/apiQueries.js";
@@ -139,6 +141,15 @@ export const approveResponse = async (req, res) => {
             return fd;
           })
         );
+        let clothingData = await Promise.all(
+          formData.clothings.map(async (item) => {
+            let ctd = await Clothing.findById(item.toString());
+            ctd.approved = 1;
+            ctd.updated_by = req.user._id;
+            await ctd.save();
+            return ctd;
+          })
+        );
         let transportData = await Promise.all(
           formData.transports.map(async (item) => {
             let td = await Transport.findById(item.toString());
@@ -192,6 +203,7 @@ export const approveResponse = async (req, res) => {
           questionData,
           otherData,
           formData,
+          clothingData,
         };
       })
     );
@@ -346,6 +358,95 @@ export const getAllSubmissionTime = async (req, res) => {
         res.status(200).json(weeklyValues);
       });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAdminResponseTracker = async (req, res) => {
+  const { page } = req.query;
+
+  const additionalQueryParams = {};
+  additionalQueryParams.approved = 1;
+  // query.created_at = { $gte: getLastWeeksDate() };
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $eq: [
+            { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
+            currentWeek,
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  // const currentPage = page || 1;
+  // const skip = (currentPage - 1) * 10;
+  try {
+    let teamLeadIds;
+    let results;
+    const totalSubmision = await Form.countDocuments(query);
+    const totalTeamLeads = await User.countDocuments({
+      role: "team_lead",
+    });
+    const teamLead = await User.find({
+      role: "team_lead",
+    }).exec((err, teamLead) => {
+      if (err) {
+        console.error("Error:", err);
+        // res.status(500).json({ message: err.message });
+      } else {
+        teamLeadIds = teamLead.map((teamlead) => teamlead._id);
+
+        //get response
+        const data = Form.find({
+          updated_by: { $in: teamLeadIds },
+          $expr: {
+            $eq: [
+              { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
+              currentWeek,
+            ],
+          },
+        }).exec((err, data) => {
+          if (err) {
+            console.error("Error2:", err);
+          } else {
+            // Create a map of enumeratorId to response for easier lookup
+            const responseMap = new Map();
+            data.forEach((response) => {
+              responseMap.set(response.updated_by.toString(), response);
+            });
+            // Iterate through the enmerators and determine the status
+            results = teamLead.map((teamlead) => {
+              const response = responseMap.get(teamlead._id.toString());
+              const status = !!response;
+              const state = response ? response.state : null;
+              const lga = response ? response.lga : null;
+              const updated_at = response ? response.updated_at : null;
+              const form_id = response ? response._id : null;
+
+              return {
+                first_name: teamlead.firstName,
+                last_name: teamlead.lastName,
+                id: teamlead.id,
+                state,
+                lga,
+                updated_at,
+                status,
+                form_id,
+              };
+            });
+            res.status(200).json({ results, totalTeamLeads, totalSubmision });
+          }
+        });
+      }
+    });
+
+    // res.status(200).json({ data, totalCount });
+  } catch (error) {
+    // return next(new ErrorHandler(error.message, 500));
     res.status(500).json({ message: error.message });
   }
 };

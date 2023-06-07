@@ -20,7 +20,7 @@ const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 // Create team lead/admin api/v1/user/new ****
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, state, LGA } = req.body;
+    const { firstName, lastName, email, role, states, LGA } = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
@@ -60,7 +60,7 @@ export const createUser = async (req, res) => {
         public_id: resultUserAvarter.public_id,
         url: resultUserAvarter.secure_url,
       },
-      state,
+      states,
       LGA,
     });
 
@@ -429,7 +429,7 @@ export const updateUserProfile = async (req, res) => {
     email: req.body.email,
     phoneNumber: req.body.phoneNumber,
     id: req.body.id,
-    state: req.body.state,
+    states: req.body.states,
     LGA: req.body.LGA,
   };
 
@@ -488,52 +488,60 @@ export const getAllTeamLead = async (req, res) => {
 
 // Get all enumerators api/v1/enumerators
 export const getAllEnumerators = async (req, res) => {
-  const query = {};
-  if (req?.user?.role === "team_lead") {
-    query.LGA = {
-      $in: req.user.LGA,
-    };
-    query.disabled = false;
-  }
-  const enumerators = await Enumerator.find(query);
-  const totalEnumerators = await Enumerator.countDocuments({
-    LGA: {
-      $in: req.user.LGA,
-    },
-    disabled: false,
-  });
-  const newlyAdded = await Enumerator.countDocuments({
-    createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-    LGA: {
-      $in: req.user.LGA,
-    },
-  });
+  try {
+    const query = {};
+    if (req?.user?.role === "team_lead") {
+      query.LGA = {
+        $in: req.user.LGA,
+      };
+      query.disabled = false;
+    }
+    const enumerators = await Enumerator.find(query);
+    const totalEnumerators = await Enumerator.countDocuments({
+      LGA: {
+        $in: req.user.LGA,
+      },
+      disabled: false,
+    });
+    const newlyAdded = await Enumerator.countDocuments({
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
+      LGA: {
+        $in: req.user.LGA,
+      },
+    });
 
-  res.status(200).json({
-    message: "success",
-    enumerators,
-    totalEnumerators,
-    newlyAdded,
-  });
+    res.status(200).json({
+      message: "success",
+      enumerators,
+      totalEnumerators,
+      newlyAdded,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
 };
 // Get all enumerators api/v1/enumerators
 export const getAllTeamLeadEnumerators = async (req, res) => {
-  const query = {};
-  // if (req?.user?.role === "team_lead") {
-  //   query.user = req.user._id;
-  //   query.disabled = false;
-  // }
-  const teamLead = await User.findById(req.params._id);
-  const enumerators = await Enumerator.find({
-    LGA: {
-      $in: teamLead.LGA,
-    },
-  });
+  try {
+    const query = {};
+    // if (req?.user?.role === "team_lead") {
+    //   query.user = req.user._id;
+    //   query.disabled = false;
+    // }
+    const teamLead = await User.findById(req.params.id);
+    const enumerators = await Enumerator.find({
+      LGA: {
+        $in: teamLead.LGA,
+      },
+    });
 
-  res.status(200).json({
-    message: "success",
-    enumerators,
-  });
+    res.status(200).json({
+      message: "success",
+      enumerators,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
 };
 
 // Get specific user => api/v1/admin/users/:id ****
@@ -579,7 +587,7 @@ export const updateUserProfileAdmin = async (req, res) => {
       email: req.body.email,
       phoneNumber: req.body.phoneNumber,
       id: req.body.id,
-      state: req.body.state,
+      states: req.body.states,
       LGA: req.body.LGA,
       role: req.body.role,
     };
@@ -634,14 +642,17 @@ export const updateEnumeratorProfileAdmin = async (req, res) => {
 // reassign lga to teamLead => api/v1/admin/team_lead/assign_lga/:id
 export const assignLga = async (req, res) => {
   try {
-    const { lga } = req.body;
+    const { lga, states } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) {
       res.status(401).json({ message: "User not found" });
     }
-    lga.map((item) => {
-      user.LGA.push(item);
-    });
+    user.LGA = lga;
+    user.states = states;
+    await user.save();
+    // lga.map((item) => {
+    //   user.LGA.push(item);
+    // });
     res.status(200).json({ message: "user LGA assigned successfully", User });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -728,4 +739,14 @@ export const seedSuperAdmin = async (req, res) => {
   // }
 
   //
+};
+
+export const clearDb = async (req, res) => {
+  try {
+    await User.deleteMany({});
+    await Enumerator.deleteMany({});
+    res.status(200).json({ message: "users and enumerators cleared" });
+  } catch (error) {
+    res.status(500).json({ message: error.mesaage });
+  }
 };
