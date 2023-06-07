@@ -40,14 +40,22 @@ export const createUser = async (req, res) => {
       id = generateId();
     }
 
-    const resultUserAvarter = await cloudinary.v2.uploader.upload(
-      req.body.avarter,
-      {
-        folder: "avarters",
-        width: 150,
-        crop: "scale",
-      }
-    );
+    let resultUserAvarter;
+    try {
+      resultUserAvarter = await cloudinary.v2.uploader.upload(
+        req.body.avarter,
+        {
+          folder: "avarters",
+          width: 150,
+          crop: "scale",
+        }
+      );
+    } catch (error) {
+      return res.status(400).json({
+        message: error.mesaage,
+      });
+      // throw new Error(error.message);
+    }
 
     const newUser = await User.create({
       id,
@@ -378,7 +386,7 @@ export const updatePassword = async (req, res) => {
     if (!VerifyPassword) {
       return res.status(401).json({ message: "old password do not match" });
     }
-    if (password === confirmPassword) {
+    if (password !== confirmPassword) {
       return res.status(401).json({ message: "password do not match" });
     }
     user.password = password;
@@ -409,7 +417,7 @@ export const updateEnumeratorPassword = async (req, res) => {
     if (!VerifyPassword) {
       return res.status(401).json({ message: "old password do not match" });
     }
-    if (password === confirmPassword) {
+    if (password !== confirmPassword) {
       return res.status(401).json({ message: "password do not match" });
     }
     enumerator.password = password;
