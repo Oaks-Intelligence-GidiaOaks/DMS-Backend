@@ -1,22 +1,16 @@
 import nodemailer from "nodemailer";
 
 const sendEmail = async (options) => {
-  // const transporter = nodemailer.createTransport({
-  //   host: process.env.SMTP_HOST,
-  //   port: process.env.SMTP_PORT,
-  //   auth: {
-  //     user: process.env.SMTP_USER,
-  //     pass: process.env.SMTP_PASSWORD,
-  //   },
-  // });
+ 
   try {
     const transporter = nodemailer.createTransport({
-      type: "OAuth2",
-      user: process.env.MAIL_USER,
-      clientId: process.env.MY_CLIENT_ID,
-      clientSecret: process.env.MY_CLIENT_SECRET,
-      refreshToken: process.env.REFRESH_TOKEN,
-      accessToken: process.env.ACCESS_TOKEN,
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASSWORD,
+      },
     });
 
     const message = {
@@ -27,7 +21,10 @@ const sendEmail = async (options) => {
     };
 
     await transporter.sendMail(message);
-  } catch (error) {}
+
+  } catch (error) {
+    throw new Error(error)
+  }
 };
 
 export default sendEmail;

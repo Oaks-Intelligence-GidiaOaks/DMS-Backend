@@ -9,7 +9,7 @@ import catchAsyncErrors from "./catchAsyncError.js";
 export const isAuthenticatedUser = async (req, res, next) => {
   try {
     // const { token } = req.cookies;
-    const token = req.headers.authorization.split(" ")[1];
+    const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
     if (!token) {
       res
         .status(401)

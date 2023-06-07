@@ -40,14 +40,14 @@ export const createUser = async (req, res) => {
       id = generateId();
     }
 
-    // const resultUserAvarter = await cloudinary.v2.uploader.upload(
-    //   req.body.avarter,
-    //   {
-    //     folder: "avarters",
-    //     width: 150,
-    //     crop: "scale",
-    //   }
-    // );
+    const resultUserAvarter = await cloudinary.v2.uploader.upload(
+      req.body.avarter,
+      {
+        folder: "avarters",
+        width: 150,
+        crop: "scale",
+      }
+    );
 
     const newUser = await User.create({
       id,
@@ -57,8 +57,8 @@ export const createUser = async (req, res) => {
       role,
       password: "123456",
       avarter: {
-        public_id: "resultUserAvarter.public_id",
-        url: "resultUserAvarter.secure_url",
+        public_id: resultUserAvarter.public_id,
+        url: resultUserAvarter.secure_url,
       },
       state,
       LGA,
@@ -131,14 +131,14 @@ export const createEnumerator = async (req, res) => {
     const password = 123456;
     console.log(password, "**pass");
 
-    // const resultUserAvarter = await cloudinary.v2.uploader.upload(
-    //   req.body.avarter,
-    //   {
-    //     folder: "avarters",
-    //     width: 150,
-    //     crop: "scale",
-    //   }
-    // );
+    const resultUserAvarter = await cloudinary.v2.uploader.upload(
+      req.body.avarter,
+      {
+        folder: "avarters",
+        width: 150,
+        crop: "scale",
+      }
+    );
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
       firstName,
@@ -150,8 +150,8 @@ export const createEnumerator = async (req, res) => {
       identityType,
       identity,
       identityImage: {
-        public_id: "resultUserAvarter.public_id",
-        url: "resultUserAvarter.secure_url",
+        public_id: resultUserAvarter.public_id,
+        url: resultUserAvarter.secure_url,
       },
       state,
       LGA,
@@ -163,18 +163,18 @@ export const createEnumerator = async (req, res) => {
     await user.save();
 
     // send password to user email address
-    // if (newEnumerator) {
-    //   try {
-    //     sendEmail({
-    //       email,
-    //       subject: "Gidiaoks DCF Password",
-    //       message: `Please sign in to DCF with this password: ${password}. Cheers!`,
-    //     });
-    //   } catch (error) {
-    //     res.status(500).json({ error });
-    //   }
-    // }
-    // sendToken(newEnumerator, 200, res);
+    if (newEnumerator) {
+      try {
+        sendEmail({
+          email,
+          subject: "Gidiaoks DCF Password",
+          message: `Please sign in to DCF with this password: ${password}. Cheers!`,
+        });
+      } catch (error) {
+        res.status(500).json({ error });
+      }
+    }
+    sendToken(newEnumerator, 200, res);
 
     res.status(200).json({
       success: true,
