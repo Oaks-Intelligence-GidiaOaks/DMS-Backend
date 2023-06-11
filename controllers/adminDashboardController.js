@@ -193,8 +193,16 @@ export const getSubmissionCount = async (req, res) => {
       {
         $match: {
           created_at: {
-            $gte: new Date(currentYear, 0, 1), // Start of the current year
-            $lt: new Date(currentYear + 1, 0, 1), // Start of the next year
+            $gte: new Date(
+              req.query.yearFilter ? req.query.yearFilter : currentYear,
+              0,
+              1
+            ), // Start of the current year
+            $lt: new Date(
+              req.query.yearFilter ? req.query.yearFilter : currentYear + 1,
+              0,
+              1
+            ), // Start of the next year
           },
         },
       },
