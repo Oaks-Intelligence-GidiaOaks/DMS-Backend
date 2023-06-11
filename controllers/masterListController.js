@@ -3,33 +3,39 @@ import Form from "../models/formModel.js";
 import "../utils/dateUtils.js";
 
 const currentWeek = new Date().getWeek();
+const today = new Date();
+const oneMonthAgo = new Date();
+oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
 export const getMasterListData = async (req, res) => {
   try {
-    const { weekFilter = 0 } = req.query;
-    const additionalQueryParams = {};
+    const { startDateFilter, endDateFilter } = req.query;
+    const query = {};
+    const startDate = startDateFilter ? startDateFilter : oneMonthAgo;
+    const endDate = endDateFilter ? endDateFilter : today;
     if (req?.user?.role === "team_lead") {
-      additionalQueryParams.lga = {
+      query.lga = {
         $in: req.user.LGA,
       };
     }
-
     if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
-      additionalQueryParams.approved = 1;
+      query.approved = 1;
     }
-    const query = {
-      $and: [
-        {
-          $expr: {
-            $eq: [
-              { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-              weekFilter ? parseInt(weekFilter) : currentWeek,
-            ],
-          },
-        },
-        additionalQueryParams,
-      ],
-    };
+    console.log(startDate, endDate);
+    query.created_at = { $gte: startDate, $lte: endDate };
+    // const query = {
+    //   $and: [
+    //     {
+    //       $expr: {
+    //         $eq: [
+    //           { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+    //           weekFilter ? parseInt(weekFilter) : currentWeek,
+    //         ],
+    //       },
+    //     },
+    //     additionalQueryParams,
+    //   ],
+    // };
 
     // Query the database for the desired forms
     Form.find(query)

@@ -20,7 +20,7 @@ const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 // Create team lead/admin api/v1/user/new ****
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, states, LGA} = req.body;
+    const { firstName, lastName, email, role, states, LGA } = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
@@ -222,8 +222,12 @@ export const loginUser = async (req, res) => {
             "Your account has been disabled. Please contact the administrator for assistance",
         });
       }
-
-      const passwordMatch = user.isPasswordMatch(password);
+      const passwordMatch = await user.isPasswordMatch(password);
+      if (!passwordMatch) {
+        return res.status(401).json({
+          message: "Invalid Id or password, please try again",
+        });
+      }
       const token = sendToken(user);
 
       res.status(200).json({ user, token });
@@ -245,6 +249,11 @@ export const loginUser = async (req, res) => {
       }
 
       const passwordMatch = enumerator.isPasswordMatch(password);
+      if (!passwordMatch) {
+        return res.status(401).json({
+          message: "Invalid Id or password, please try again",
+        });
+      }
       const token = sendToken(enumerator);
 
       res.status(200).json({ user: enumerator, token });
