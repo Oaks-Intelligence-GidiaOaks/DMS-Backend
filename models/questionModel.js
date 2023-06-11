@@ -23,6 +23,14 @@ const questionSchema = new Schema({
   comment_for_crime_report: { type: String },
   accidents: { type: Boolean, required: true },
   comment_for_accidents: { type: String },
+  commentImage: {
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+  },
   note: { type: String },
   team_lead_note: { type: String },
   created_at: { type: Date, default: new Date() },
