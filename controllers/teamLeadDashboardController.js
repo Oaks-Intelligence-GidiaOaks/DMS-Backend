@@ -265,7 +265,6 @@ export const getPriceFluctuation = async (req, res) => {
 };
 
 export const getSubmisionRate = async (req, res) => {
-  console.log(req.user.LGA);
   const additionalQueryParams = {};
   if (req?.user?.role === "team_lead") {
     // additionalQueryParams.team_lead_id = req.user._id;
@@ -280,6 +279,10 @@ export const getSubmisionRate = async (req, res) => {
           $eq: [
             { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
             currentWeek,
+          ],
+          $eq: [
+            { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+            currentYear,
           ],
         },
       },
