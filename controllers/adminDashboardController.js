@@ -151,7 +151,7 @@ export const getEnumeratorsCount = async (req, res) => {
       disabled: false,
     });
     const newlyAdded = await Enumerator.countDocuments({
-      created_at: { $gte: startOfMonth, $lt: endOfMonth },
+      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
     });
     res.status(200).json({ totalEnumerators, newlyAdded });
   } catch (error) {
