@@ -43,6 +43,27 @@ const userSchema = new Schema({
       type: String,
     },
   },
+  phoneNumber: {
+    type: String,
+    required: true,
+  },
+  identityType: {
+    type: String,
+    enum: ["NIN", "Passport", "Voters Card", "Drivers license"],
+  },
+  identity: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  identityImage: {
+    public_id: {
+      type: String,
+    },
+    url: {
+      type: String,
+    },
+  },
   states: [
     {
       type: String,

@@ -20,7 +20,19 @@ const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
 // Create team lead/admin api/v1/user/new ****
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, email, role, states, LGA } = req.body;
+    const {
+      firstName,
+      lastName,
+      email,
+      role,
+      states,
+      phoneNumber,
+      identity,
+      identityType,
+      identityImage,
+      avatar,
+      LGA,
+    } = req.body;
     const user = await User.findOne({ email });
 
     if (user) {
@@ -40,22 +52,24 @@ export const createUser = async (req, res) => {
       id = generateId();
     }
 
-    // let resultUserAvatar;
-    // try {
-    //   resultUserAvatar = await cloudinary.v2.uploader.upload(
-    //     avatar,
-    //     {
-    //       folder: "avarters",
-    //       width: 150,
-    //       crop: "scale",
-    //     }
-    //   );
-    // } catch (error) {
-    //   return res.status(400).json({
-    //     message: error.mesaage,
-    //   });
-    //   // throw new Error(error.message);
-    // }
+    let resultUserAvatar;
+    let resultIdentityImage;
+    try {
+      resultUserAvatar = await cloudinary.v2.uploader.upload(avatar, {
+        folder: "avatar",
+        width: 150,
+        crop: "scale",
+      });
+      resultIdentityImage = await cloudinary.v2.uploader.upload(identityImage, {
+        folder: "government_id",
+        width: 150,
+        crop: "scale",
+      });
+    } catch (error) {
+      return res.status(400).json({
+        message: error.mesaage,
+      });
+    }
 
     const newUser = await User.create({
       id,
@@ -63,10 +77,17 @@ export const createUser = async (req, res) => {
       lastName,
       email,
       role,
+      phoneNumber,
       password: "123456",
+      identityType,
+      identity,
+      identityImage: {
+        public_id: resultIdentityImage.public_id,
+        url: resultIdentityImage.secure_url,
+      },
       avatar: {
-        public_id: "resultUserAvatar.public_id",
-        url: "resultUserAvatar.secure_url",
+        public_id: resultUserAvatar.public_id,
+        url: resultUserAvatar.secure_url,
       },
       states,
       LGA,
@@ -137,16 +158,21 @@ export const createEnumerator = async (req, res) => {
     // Generate a new password
     // const password = generatePassword();
     const password = 123456;
-    console.log(password, "**pass");
 
-    // const resultIdentityImage = await cloudinary.v2.uploader.upload(
-    //   req.body.avarter,
-    //   {
-    //     folder: "avarters",
-    //     width: 150,
-    //     crop: "scale",
-    //   }
-    // );
+    // Handle cloudinary upload
+    let resultIdentityImage;
+    try {
+      await cloudinary.v2.uploader.upload(req.body.avarter, {
+        folder: "avarters",
+        width: 150,
+        crop: "scale",
+      });
+    } catch (error) {
+      res.status(400).json({
+        mesaage: error.mesaage,
+      });
+    }
+
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
       firstName,
@@ -158,8 +184,8 @@ export const createEnumerator = async (req, res) => {
       identityType,
       identity,
       identityImage: {
-        public_id: "resultIdentityImage.public_id",
-        url: "resultIdentityImage.secure_url",
+        public_id: resultIdentityImage.public_id,
+        url: resultIdentityImage.secure_url,
       },
       state,
       LGA,
@@ -171,17 +197,17 @@ export const createEnumerator = async (req, res) => {
     await user.save();
 
     // send password to user email address
-    if (newEnumerator) {
-      try {
-        sendEmail({
-          email,
-          subject: "Gidiaoks DCF Password",
-          message: `Please sign in to DCF with this password: ${password}. Cheers!`,
-        });
-      } catch (error) {
-        res.status(500).json({ error });
-      }
-    }
+    // if (newEnumerator) {
+    //   try {
+    //     sendEmail({
+    //       email,
+    //       subject: "Gidiaoks DCF Password",
+    //       message: `Please sign in to DCF with this password: ${password}. Cheers!`,
+    //     });
+    //   } catch (error) {
+    //     res.status(500).json({ error });
+    //   }
+    // }
     sendToken(newEnumerator, 200, res);
 
     res.status(200).json({
@@ -222,15 +248,18 @@ export const loginUser = async (req, res) => {
             "Your account has been disabled. Please contact the administrator for assistance",
         });
       }
+
       const passwordMatch = await user.isPasswordMatch(password);
-      if (!passwordMatch) {
-        return res.status(401).json({
-          message: "Invalid Id or password, please try again",
+      const token = passwordMatch && sendToken(user);
+
+      if (passwordMatch) {
+        res.status(200).json({ user, token });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: "Invalid password, please try again",
         });
       }
-      const token = sendToken(user);
-
-      res.status(200).json({ user, token });
       // passwordMatch && sendToken(user, 200, res);
     } else {
       const enumerator = await Enumerator.findOne({ id }).select("+password");
@@ -248,16 +277,17 @@ export const loginUser = async (req, res) => {
         });
       }
 
-      const passwordMatch = enumerator.isPasswordMatch(password);
-      if (!passwordMatch) {
-        return res.status(401).json({
-          message: "Invalid Id or password, please try again",
+      const passwordMatch = await enumerator.isPasswordMatch(password);
+      const token = passwordMatch && sendToken(enumerator);
+
+      if (passwordMatch) {
+        res.status(200).json({ user, token });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: "Invalid password, please try again",
         });
       }
-      const token = sendToken(enumerator);
-
-      res.status(200).json({ user: enumerator, token });
-      // passwordMatch && sendToken(enumerator, 200, res);
     }
   } catch (error) {
     res.status(401).json({ message: error.message, stack: error.stack });
