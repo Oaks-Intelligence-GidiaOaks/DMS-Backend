@@ -52,24 +52,20 @@ export const createUser = async (req, res) => {
       id = generateId();
     }
 
-    let resultUserAvatar;
-    let resultIdentityImage;
-    try {
-      resultUserAvatar = await cloudinary.v2.uploader.upload(avatar, {
-        folder: "avatar",
-        width: 150,
-        crop: "scale",
-      });
-      resultIdentityImage = await cloudinary.v2.uploader.upload(identityImage, {
+    const resultUserAvatar = await cloudinary.v2.uploader.upload(avatar, {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+    });
+
+    const resultIdentityImage = await cloudinary.v2.uploader.upload(
+      identityImage,
+      {
         folder: "government_id",
         width: 150,
         crop: "scale",
-      });
-    } catch (error) {
-      return res.status(400).json({
-        message: error.mesaage,
-      });
-    }
+      }
+    );
 
     const newUser = await User.create({
       id,
@@ -92,21 +88,6 @@ export const createUser = async (req, res) => {
       states,
       LGA,
     });
-
-    // send password to user email address
-    // if (newUser) {
-    //   try {
-    //     sendEmail({
-    //       email,
-    //       subject: "Gidiaoks DCF Password",
-    //       message: `Please sign in to DCF with this password: ${id}. Cheers!`,
-    //     });
-    //   } catch (error) {
-    //     res.status(400).json({
-    //       message: error.message,
-    //     });
-    //   }
-    // }
 
     // sendToken(newUser, 200, res);
     res.status(200).json({
@@ -131,6 +112,7 @@ export const createEnumerator = async (req, res) => {
       phoneNumber,
       identityType,
       identity,
+      identityImage,
       state,
       LGA,
     } = req.body;
@@ -160,18 +142,14 @@ export const createEnumerator = async (req, res) => {
     const password = 123456;
 
     // Handle cloudinary upload
-    let resultIdentityImage;
-    try {
-      await cloudinary.v2.uploader.upload(req.body.avarter, {
-        folder: "avarters",
+    const resultIdentityImage = await cloudinary.v2.uploader.upload(
+      identityImage,
+      {
+        folder: "government_id",
         width: 150,
         crop: "scale",
-      });
-    } catch (error) {
-      res.status(400).json({
-        mesaage: error.mesaage,
-      });
-    }
+      }
+    );
 
     // Create the enumerator
     const newEnumerator = await Enumerator.create({
@@ -196,18 +174,6 @@ export const createEnumerator = async (req, res) => {
     user.enumerators.push(newEnumerator._id);
     await user.save();
 
-    // send password to user email address
-    // if (newEnumerator) {
-    //   try {
-    //     sendEmail({
-    //       email,
-    //       subject: "Gidiaoks DCF Password",
-    //       message: `Please sign in to DCF with this password: ${password}. Cheers!`,
-    //     });
-    //   } catch (error) {
-    //     res.status(500).json({ error });
-    //   }
-    // }
     sendToken(newEnumerator, 200, res);
 
     res.status(200).json({
@@ -215,7 +181,6 @@ export const createEnumerator = async (req, res) => {
       newEnumerator,
     });
   } catch (error) {
-    // res.status(500).json({ message: error.message, stack: error.stack });
     res.status(500).json(error.message);
   }
 };
@@ -295,74 +260,80 @@ export const loginUser = async (req, res) => {
 };
 
 // Forgot password => api/v1/password/reset ****
-export const forgotPassword = async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+// export const forgotPassword = async (req, res) => {
+//   const user = await User.findOne({ email: req.body.email });
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
+//   if (!user) {
+//     return res.status(404).json({ message: "User not found" });
+//   }
 
-  // Get reset password token
-  const resetPasswordToken = user.getResetPasswordToken();
-  await user.save({ validateBeforeSave: false });
+//   // Get reset password token
+//   const resetPasswordToken = user.getResetPasswordToken();
+//   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/password/reset/${resetPasswordToken}`;
+//   const resetPasswordUrl = `${req.protocol}://${req.get(
+//     "host"
+//   )}/api/v1/password/reset/${resetPasswordToken}`;
 
-  // email message
-  const message = `Click this link to reset your password:\n\n${resetPasswordUrl}\n\nIf your have not requested a password reset please ignore.`;
+//   // email message
+//   const message = `Click this link to reset your password:\n\n${resetPasswordUrl}\n\nIf your have not requested a password reset please ignore.`;
 
-  try {
-    await sendEmail({
-      email: user.email,
-      subject: "DMS Password Reset",
-      message,
-    });
+//   try {
+//     await sendEmail({
+//       email: user.email,
+//       subject: "DMS Password Reset",
+//       message,
+//     });
 
-    res.status(200).json({
-      success: true,
-      message: `Email sent successfully to ${user.email}`,
-    });
-  } catch (error) {
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined;
+//     res.status(200).json({
+//       success: true,
+//       message: `Email sent successfully to ${user.email}`,
+//     });
+//   } catch (error) {
+//     user.resetPasswordToken = undefined;
+//     user.resetPasswordExpire = undefined;
 
-    // save user again
-    await user.save({ validateBeforeSave: false });
-    res.status(500).json({ message: error.message });
-  }
-};
+//     // save user again
+//     await user.save({ validateBeforeSave: false });
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
-// Reset password => api/v1/password/reset/:token ****
+// Reset password => api/v1/password/reset ****
 export const resetPassword = async (req, res) => {
-  // Hash the url Token
-  const resetPasswordToken = crypto
-    .createHash("sha256")
-    .update(req.params.token)
-    .digest("hex");
+  //  find user/enumerator by id
+  try {
+    const { id } = req.body;
 
-  const user = await User.findOne({
-    resetPasswordToken,
-    resetPasswordExpire: { $gt: Date.now() },
-  });
+    const user = await User.findOne({ id }).select("+password");
 
-  if (!user) {
-    return next(
-      new ErrorHandler("Password reset token is ivalid or has expired", 400)
-    );
+    if (user) {
+      user.password = "123456";
+      user.firstUse = true;
+      user && (await user.save());
+
+      res.status(200).json({
+        message: "pasword reset successful",
+      });
+    } else {
+      const enumerator = await Enumerator.findOne({ id }).select("+password");
+
+      if (enumerator) {
+        enumerator.password = "123456";
+        enumerator.firstUse = true;
+        enumerator && (await enumerator.save());
+
+        res.status(200).json({
+          message: "pasword reset successful",
+        });
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 
-  if (req.body.password !== req.body.confirmPassword) {
-    return next(new ErrorHandler("Password does not match", 400));
-  }
-
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpire = undefined;
-
-  await user.save();
-  sendToken(user, 200, res);
+  // await user.save();
+  // sendToken(user, 200, res);
 };
 
 // Get currently logged in user profile => api/v1/me ****
@@ -468,14 +439,39 @@ export const updateEnumeratorPassword = async (req, res) => {
   }
 };
 
-// Update user details/profile => api/v1/me/update ****
+// Update user details/profile => api/v1/user/update ****
 export const updateUserProfile = async (req, res) => {
+  const resultUserAvatar = await cloudinary.v2.uploader.upload(avatar, {
+    folder: "avatars",
+    width: 150,
+    crop: "scale",
+    public_id: req.user.avatar.public_id,
+  });
+
+  const resultIdentityImage = await cloudinary.v2.uploader.upload(
+    identityImage,
+    {
+      folder: "government_id",
+      width: 150,
+      crop: "scale",
+      public_id: req.user.avatar.public_id,
+    }
+  );
   const newUserDetails = {
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     email: req.body.email,
     phoneNumber: req.body.phoneNumber,
-    id: req.body.id,
+    identity: req.body.identity,
+    identityType: req.body.identityType,
+    identityImage: {
+      public_id: resultIdentityImage.public_id,
+      url: resultIdentityImage.secure_url,
+    },
+    avatar: {
+      public_id: resultUserAvatar.public_id,
+      url: resultUserAvatar.secure_url,
+    },
     states: req.body.states,
     LGA: req.body.LGA,
   };
@@ -485,6 +481,48 @@ export const updateUserProfile = async (req, res) => {
     runValidators: true,
     useFindAndModify: false,
   });
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+};
+
+// Update enumerator details/profile => api/v1/enumerator/update ****
+export const updateEnumeratorProfile = async (req, res) => {
+  const resultIdentityImage = await cloudinary.v2.uploader.upload(
+    identityImage,
+    {
+      folder: "government_id",
+      width: 150,
+      crop: "scale",
+      public_id: req.enumerator.avatar.public_id,
+    }
+  );
+  const newEnumeratorDetails = {
+    firstname: req.body.firstname,
+    lastname: req.body.lastname,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
+    identity: req.body.identity,
+    identityType: req.body.identityType,
+    identityImage: {
+      public_id: resultIdentityImage.public_id,
+      url: resultIdentityImage.secure_url,
+    },
+    states: req.body.states,
+    LGA: req.body.LGA,
+  };
+
+  const user = await Enumerator.findByIdAndUpdate(
+    req.enumerator.id,
+    newEnumeratorDetails,
+    {
+      new: true,
+      runValidators: true,
+      useFindAndModify: false,
+    }
+  );
 
   res.status(200).json({
     success: true,
