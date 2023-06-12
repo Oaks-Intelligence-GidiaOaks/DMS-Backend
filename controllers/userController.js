@@ -281,7 +281,7 @@ export const loginUser = async (req, res) => {
       const token = passwordMatch && sendToken(enumerator);
 
       if (passwordMatch) {
-        res.status(200).json({ enumerator, token });
+        res.status(200).json({ user: enumerator, token });
       } else {
         res.status(401).json({
           success: false,
