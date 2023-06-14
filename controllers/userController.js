@@ -441,39 +441,23 @@ export const updateEnumeratorPassword = async (req, res) => {
 
 // Update user details/profile => api/v1/user/update ****
 export const updateUserProfile = async (req, res) => {
-  const resultUserAvatar = await cloudinary.v2.uploader.upload(avatar, {
+  const resultUserAvatar = await cloudinary.v2.uploader.upload(req.body.avatar, {
     folder: "avatars",
     width: 150,
     crop: "scale",
     public_id: req.user.avatar.public_id,
   });
 
-  const resultIdentityImage = await cloudinary.v2.uploader.upload(
-    identityImage,
-    {
-      folder: "government_id",
-      width: 150,
-      crop: "scale",
-      public_id: req.user.avatar.public_id,
-    }
-  );
   const newUserDetails = {
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     email: req.body.email,
     phoneNumber: req.body.phoneNumber,
-    identity: req.body.identity,
-    identityType: req.body.identityType,
-    identityImage: {
-      public_id: resultIdentityImage.public_id,
-      url: resultIdentityImage.secure_url,
-    },
     avatar: {
       public_id: resultUserAvatar.public_id,
       url: resultUserAvatar.secure_url,
     },
     states: req.body.states,
-    LGA: req.body.LGA,
   };
 
   const user = await User.findByIdAndUpdate(req.user.id, newUserDetails, {
