@@ -2,7 +2,7 @@ import express from "express";
 import {
   createUser,
   createEnumerator,
-  forgotPassword,
+  // forgotPassword,
   getAllUsers,
   getAllEnumerators,
   getOneUser,
@@ -37,8 +37,8 @@ router.post("/user/new", createUser);
 router.post("/enumerator/new", isAuthenticatedUser, createEnumerator);
 router.post("/login", loginUser);
 
-router.post("/password/forgot", forgotPassword);
-router.put("/password/reset/:token", resetPassword);
+// router.post("/password/forgot", forgotPassword);
+router.put("/password/reset", isAuthenticatedUser, resetPassword);
 
 router.get("/logout", logoutUser);
 
