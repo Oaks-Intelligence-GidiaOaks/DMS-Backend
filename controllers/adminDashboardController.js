@@ -189,17 +189,22 @@ export const getSubmissionCount = async (req, res) => {
       assignedLga += item.LGA.length;
     });
     // Get the number of submissions for each month of the current year
+
     Form.aggregate([
       {
         $match: {
           created_at: {
             $gte: new Date(
-              req.query.yearFilter ? req.query.yearFilter : currentYear,
+              req.query.yearFilter
+                ? parseInt(req.query.yearFilter)
+                : currentYear,
               0,
               1
             ), // Start of the current year
             $lt: new Date(
-              req.query.yearFilter ? req.query.yearFilter : currentYear + 1,
+              req.query.yearFilter
+                ? parseInt(req.query.yearFilter) + 1
+                : currentYear + 1,
               0,
               1
             ), // Start of the next year
