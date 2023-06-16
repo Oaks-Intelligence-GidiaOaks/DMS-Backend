@@ -18,7 +18,7 @@ const productSchema = new Schema({
   approved: { type: Number, default: 0 },
   team_lead_id: { type: String, required: true },
   name: { type: String, required: true },
-  price: { type: Number, required: true },
+  price: { type: String, required: true },
   brand: { type: String },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },

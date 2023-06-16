@@ -36,7 +36,6 @@ export const getMasterListData = async (req, res) => {
     //     },
     //     additionalQueryParams,
     //   ],
-    // };
 
     // Query the database for the desired forms
     const total = await Form.countDocuments(query);

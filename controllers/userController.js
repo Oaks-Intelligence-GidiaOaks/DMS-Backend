@@ -411,6 +411,8 @@ export const updatePassword = async (req, res) => {
 // Update password => api/v1/password/update ****
 export const updateEnumeratorPassword = async (req, res) => {
   try {
+    console.log(req.user);
+
     const { oldPassword, password, confirmPassword } = req.body;
 
     const enumerator = await Enumerator.findById(req.enumerator._id).select(
@@ -439,14 +441,20 @@ export const updateEnumeratorPassword = async (req, res) => {
   }
 };
 
-// Update user details/profile => api/v1/user/update ****
+// Update user details/profile => api/v1/me/update ****
 export const updateUserProfile = async (req, res) => {
-  const resultUserAvatar = await cloudinary.v2.uploader.upload(req.body.avatar, {
-    folder: "avatars",
-    width: 150,
-    crop: "scale",
-    public_id: req.user.avatar.public_id,
-  });
+  console.log(req.user._id);
+  const newUser = await User.findById("647e3e6cccaa6bef13f72f4c");
+
+  const resultUserAvatar = await cloudinary.v2.uploader.upload(
+    req.body.avatar,
+    {
+      folder: "avatars",
+      width: 150,
+      crop: "scale",
+      public_id: req.user.avatar.public_id,
+    }
+  );
 
   const newUserDetails = {
     firstname: req.body.firstname,
@@ -460,11 +468,13 @@ export const updateUserProfile = async (req, res) => {
     states: req.body.states,
   };
 
-  const user = await User.findByIdAndUpdate(req.user.id, newUserDetails, {
+  const user = await User.findByIdAndUpdate(req.user._id, newUserDetails, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
+
+  console.log(newUser, "updated user");
 
   res.status(200).json({
     success: true,
@@ -499,7 +509,7 @@ export const updateEnumeratorProfile = async (req, res) => {
   };
 
   const user = await Enumerator.findByIdAndUpdate(
-    req.enumerator.id,
+    req.enumerator._id,
     newEnumeratorDetails,
     {
       new: true,
@@ -661,7 +671,7 @@ export const updateUserProfileAdmin = async (req, res) => {
       role: req.body.role,
     };
 
-    const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
+    const user = await User.findByIdAndUpdate(req.params._id, newUserDetails, {
       new: true,
       runValidators: true,
       useFindAndModify: false,
