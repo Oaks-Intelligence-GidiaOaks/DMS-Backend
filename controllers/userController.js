@@ -471,8 +471,6 @@ export const updateUserProfile = async (req, res) => {
     useFindAndModify: false,
   });
 
-  console.log(newUser, "updated user");
-
   res.status(200).json({
     success: true,
     user,
