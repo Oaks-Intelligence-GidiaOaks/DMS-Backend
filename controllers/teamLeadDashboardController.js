@@ -327,7 +327,7 @@ export const getLGACount = (req, res) => {
     const stateCounts = [];
     for (const lga of lgas) {
       stateCounts.push({
-        state: lga.state,
+        state: lga.alias,
         lgaCount: lga.lgas.length,
       });
     }

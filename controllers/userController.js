@@ -443,9 +443,6 @@ export const updateEnumeratorPassword = async (req, res) => {
 
 // Update user details/profile => api/v1/me/update ****
 export const updateUserProfile = async (req, res) => {
-  console.log(req.user._id);
-  const newUser = await User.findById("647e3e6cccaa6bef13f72f4c");
-
   const resultUserAvatar = await cloudinary.v2.uploader.upload(
     req.body.avatar,
     {
@@ -671,7 +668,7 @@ export const updateUserProfileAdmin = async (req, res) => {
       role: req.body.role,
     };
 
-    const user = await User.findByIdAndUpdate(req.params._id, newUserDetails, {
+    const user = await User.findByIdAndUpdate(req.params.id, newUserDetails, {
       new: true,
       runValidators: true,
       useFindAndModify: false,
