@@ -22,7 +22,7 @@ export const getMasterListData = async (req, res) => {
       query.approved = 1;
     }
     const currentPage = page || 1;
-    const skip = (currentPage - 1) * 20;
+    const skip = (currentPage - 1) * 60;
     query.created_at = { $gte: startDate, $lte: endDate };
     // const query = {
     //   $and: [
@@ -54,7 +54,7 @@ export const getMasterListData = async (req, res) => {
       )
       .populate("created_by") // Populate created_by and select the name and _id fields
       .skip(skip)
-      .limit(20);
+      .limit(60);
     // .exec((err, forms) => {
     //   if (err) {
     //     console.error(err);
