@@ -411,6 +411,8 @@ export const updatePassword = async (req, res) => {
 // Update password => api/v1/password/update ****
 export const updateEnumeratorPassword = async (req, res) => {
   try {
+    console.log(req.user);
+
     const { oldPassword, password, confirmPassword } = req.body;
 
     const enumerator = await Enumerator.findById(req.enumerator._id).select(
@@ -439,7 +441,7 @@ export const updateEnumeratorPassword = async (req, res) => {
   }
 };
 
-// Update user details/profile => api/v1/user/update ****
+// Update user details/profile => api/v1/me/update ****
 export const updateUserProfile = async (req, res) => {
   const resultUserAvatar = await cloudinary.v2.uploader.upload(
     req.body.avatar,
@@ -463,11 +465,13 @@ export const updateUserProfile = async (req, res) => {
     states: req.body.states,
   };
 
-  const user = await User.findByIdAndUpdate(req.user.id, newUserDetails, {
+  const user = await User.findByIdAndUpdate(req.user._id, newUserDetails, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
+
+  console.log(newUser, "updated user");
 
   res.status(200).json({
     success: true,
@@ -502,7 +506,7 @@ export const updateEnumeratorProfile = async (req, res) => {
   };
 
   const user = await Enumerator.findByIdAndUpdate(
-    req.enumerator.id,
+    req.enumerator._id,
     newEnumeratorDetails,
     {
       new: true,

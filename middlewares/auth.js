@@ -16,7 +16,7 @@ export const isAuthenticatedUser = async (req, res, next) => {
         .json({ message: "Please log in to access this resource." });
     }
     const decoded = Jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findOne({ id: decoded.user.id });
+    req.user = decoded.user;
     next();
   } catch (err) {
     console.log(err);
@@ -33,7 +33,8 @@ export const isAuthenticatedEnumerator = catchAsyncErrors(
         .json({ message: "Please log in to access this resource." });
     }
     const decoded = Jwt.verify(token, process.env.JWT_SECRET);
-    req.enumerator = await Enumerator.findOne({ id: decoded.user.id });
+    console.log(decoded);
+    req.enumerator = decoded.user;
     next();
   }
 );

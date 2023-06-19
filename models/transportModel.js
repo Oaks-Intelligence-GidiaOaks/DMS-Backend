@@ -19,7 +19,7 @@ const transportSchema = new Schema({
   team_lead_id: { type: String, required: true },
   route: { type: String, required: true },
   mode: { type: String, required: true },
-  cost: { type: Number, required: true },
+  cost: { type: String, required: true },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });

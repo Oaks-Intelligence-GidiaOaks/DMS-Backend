@@ -5,9 +5,9 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js ",
+    "start": "node server.js ",
     "dev": "NODE_ENV=DEVELOPMENT nodemon server.js",
-    "prod": "NODE_ENV=PRODUCTION nodemon server.js",
+    "prod": "NODE_ENV=PRODUCTION node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

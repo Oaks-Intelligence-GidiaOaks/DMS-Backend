@@ -17,7 +17,7 @@ const electricitySchema = new Schema({
   region: { type: String },
   approved: { type: Number, default: 0 },
   team_lead_id: { type: String, required: true },
-  hours_per_week: { type: Number, required: true },
+  hours_per_week: { type: String, required: true },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });
