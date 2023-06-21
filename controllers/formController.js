@@ -79,7 +79,17 @@ export const addFormData = async (req, res) => {
             accidents,
             comment_for_accidents,
             note,
+            comment_image,
           } = item;
+
+          const resultCommentImage = await cloudinary.v2.uploader.upload(
+            comment_image,
+            {
+              folder: "questions",
+              width: 150,
+              crop: "scale",
+            }
+          );
 
           let newQuestion = await new Question({
             created_by: req.enumerator._id,
@@ -94,6 +104,10 @@ export const addFormData = async (req, res) => {
             accidents,
             comment_for_accidents,
             note,
+            commentImage: {
+              public_id: resultCommentImage.public_id,
+              url: resultCommentImage.secure_url,
+            },
           }).save();
           return newQuestion._id;
         })

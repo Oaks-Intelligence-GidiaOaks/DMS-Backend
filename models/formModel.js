@@ -14,7 +14,7 @@ const FormSchema = new Schema({
   },
   state: { type: String, required: true },
   lga: { type: String, required: true },
-  region: { type: String },
+  region: { type: String, required: true },
   approved: { type: Number, default: 0 },
   team_lead_id: { type: String, required: true },
   foodItems: [

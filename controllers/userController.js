@@ -411,8 +411,7 @@ export const updatePassword = async (req, res) => {
 // Update password => api/v1/password/update ****
 export const updateEnumeratorPassword = async (req, res) => {
   try {
-    console.log(req.user);
-
+    
     const { oldPassword, password, confirmPassword } = req.body;
 
     const enumerator = await Enumerator.findById(req.enumerator._id).select(
