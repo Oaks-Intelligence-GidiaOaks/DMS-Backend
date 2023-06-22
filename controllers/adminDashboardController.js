@@ -146,14 +146,132 @@ export const getTeamLeadCount = async (req, res) => {
   }
 };
 export const getEnumeratorsCount = async (req, res) => {
-  try {
-    const totalEnumerators = await Enumerator.countDocuments({
-      disabled: false,
+try {
+    const { yearFilter = "" } = req.query;
+    const currentYear = yearFilter ? yearFilter : new Date().getFullYear();
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    Enumerator.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: new Date(currentYear, 0, 1), // Start of the current year
+            $lte: new Date(currentYear, 11, 31), // End of the current year
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%m-%Y",
+              date: "$createdAt",
+            },
+          },
+          added: {
+            $sum: 1,
+          },
+          disabled: {
+            $sum: {
+              $cond: [{ $eq: ["$disabled", true] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          month: {
+            $let: {
+              vars: {
+                months: months,
+              },
+              in: {
+                $arrayElemAt: [
+                  "$$months",
+                  { $subtract: [{ $toInt: { $substrCP: ["$_id", 0, 2] } }, 1] },
+                ],
+              },
+            },
+          },
+          added: 1,
+          disabled: 1,
+          _id: 0,
+        },
+      },
+      {
+        $sort: {
+          month: 1,
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          monthlyData: {
+            $push: {
+              month: "$month",
+              added: "$added",
+              disabled: "$disabled",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          monthlyData: {
+            $map: {
+              input: months,
+              as: "month",
+              in: {
+                $let: {
+                  vars: {
+                    matchedData: {
+                      $filter: {
+                        input: "$monthlyData",
+                        cond: { $eq: ["$$this.month", "$$month"] },
+                      },
+                    },
+                  },
+                  in: {
+                    $cond: {
+                      if: { $gt: [{ $size: "$$matchedData" }, 0] },
+                      then: { $arrayElemAt: ["$$matchedData", 0] },
+                      else: { month: "$$month", added: 0, disabled: 0 },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $unwind: "$monthlyData",
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$monthlyData",
+        },
+      },
+    ]).exec((err, results) => {
+      if (err) {
+        console.error("Error:", err);
+      } else {
+        res.status(200).json(results);
+      }
     });
-    const newlyAdded = await Enumerator.countDocuments({
-      createdAt: { $gte: startOfMonth, $lt: endOfMonth },
-    });
-    res.status(200).json({ totalEnumerators, newlyAdded });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
