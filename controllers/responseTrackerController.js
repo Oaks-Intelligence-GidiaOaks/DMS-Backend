@@ -24,6 +24,9 @@ function getWeekNumber(date) {
 }
 
 const currentWeek = new Date().getWeek();
+const today = new Date();
+const oneMonthAgo = new Date();
+oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
 // get response Tracker api/v1/form_response/response_tracker
 export const getResponseTracker = async (req, res) => {
@@ -239,6 +242,7 @@ export const getSubmissionTime = async (req, res) => {
       lga: {
         $in: req.user.LGA,
       },
+      created_at: { $gte: oneMonthAgo, $lte: today },
     })
       .populate("created_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
@@ -303,7 +307,7 @@ export const getAllSubmissionTime = async (req, res) => {
     }
 
     // Query the database for the desired forms
-    Form.find()
+    Form.find({ created_at: { $gte: oneMonthAgo, $lte: today } })
       .populate("updated_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
         if (err) {
@@ -312,6 +316,7 @@ export const getAllSubmissionTime = async (req, res) => {
         }
         // Perform the processing on the forms data here
         const weeklyValues = [];
+        // console.log(forms);
         // Use reduce() to select only one record for each unique team lead ID
         // const uniqueRecords = Object.values(
         //   forms.reduce((acc, obj) => {
@@ -323,7 +328,6 @@ export const getAllSubmissionTime = async (req, res) => {
         // );
         // console.log(uniqueRecords);
         // Loop through the forms array and extract the required information
-
         forms.forEach((form) => {
           // Extract the necessary data from the form object
           const { lga, currentWeek, updated_at } = form;
@@ -345,7 +349,8 @@ export const getAllSubmissionTime = async (req, res) => {
           // Calculate the week number for the submission
           const submissionDate = new Date(submissionTime);
           const submissionWeek = getISOWeek(submissionDate);
-
+          // const submissionValue = {};
+          // if (submissionWeek >= currentWeek - 4) {
           // Create the weekly value object for the submission
           const submissionValue = {
             weekNo: submissionWeek,
@@ -354,6 +359,7 @@ export const getAllSubmissionTime = async (req, res) => {
 
           // Push the submission value to the weekly values array
           weeklyValue.weeklyValues.push(submissionValue);
+          // }
         });
         res.status(200).json(weeklyValues);
       });
