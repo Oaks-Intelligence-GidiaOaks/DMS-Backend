@@ -24,6 +24,9 @@ function getWeekNumber(date) {
 }
 
 const currentWeek = new Date().getWeek();
+const today = new Date();
+const oneMonthAgo = new Date();
+oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
 // get response Tracker api/v1/form_response/response_tracker
 export const getResponseTracker = async (req, res) => {
@@ -239,6 +242,7 @@ export const getSubmissionTime = async (req, res) => {
       lga: {
         $in: req.user.LGA,
       },
+      created_at: { $gte: oneMonthAgo, $lte: today }
     })
       .populate("created_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
@@ -303,7 +307,7 @@ export const getAllSubmissionTime = async (req, res) => {
     }
 
     // Query the database for the desired forms
-    Form.find()
+    Form.find({created_at: { $gte: oneMonthAgo, $lte: today }})
       .populate("updated_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
         if (err) {
