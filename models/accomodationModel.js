@@ -8,7 +8,7 @@ const accomodationSchema = new Schema({
     ref: "Enumerator",
     // required: true,
   },
-  type: { type: String, required: true },
+  type: { type: String },
   updated_by: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

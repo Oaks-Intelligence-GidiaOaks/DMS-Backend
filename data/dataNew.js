@@ -9,6 +9,8 @@ import Question from "../models/questionModel.js";
 import "../utils/dateUtils.js";
 import dotenv from "dotenv";
 import { data } from "./excel.js";
+import { lgaData } from "./lga.js";
+import { clearDb } from "../controllers/formController.js";
 
 dotenv.config({
   path: "configs/config.env",
@@ -16,14 +18,62 @@ dotenv.config({
 
 import { connectDb } from "../configs/connectDb.js";
 
-connectDb(
-  "mongodb+srv://info:KodersOaks2023@dms.lt6sqba.mongodb.net/?retryWrites=true&w=majority"
-);
+// connectDb("");
+// clearDb()
+
+// flatten the lgaData array of objects into a single array
+const lgaLists = lgaData.flatMap((item) => item.lgas);
+
+// function to calculate most similar lga
+function calcCulateSimilarityScore(value, lga) {
+  // split string values into an array of chars and remove spaces
+  const valueChars = value.toLowerCase().replace(/\s/g, "").split("");
+  const lgaChars = lga.toLowerCase().replace(/\s/g, "").split("");
+
+  // initialize matchedChars count and make lgaCharSet unique
+  let matchedChars = 0;
+  const lgaCharSet = new Set(lgaChars);
+
+  // Perform count update
+  for (const valueChar of valueChars) {
+    if (lgaCharSet.has(valueChar)) {
+      matchedChars++;
+      lgaCharSet.delete(valueChar);
+    }
+  }
+
+  // return a ratio of matchedChars to valueChars or lgaChars with max length as score
+  return matchedChars / Math.max(valueChars.length, lgaChars.length);
+}
+
+// function finds most similar lga from excel comparing to lgaData and returns the most similarin lgaData list
+function findMostSimilarLga(value) {
+  let mostSimilarLga = null;
+  let highestSimilarityScore = 0;
+
+  // compare similarityScore of lga string, return highest score
+  for (const lga of lgaLists) {
+    const similarityScore = calcCulateSimilarityScore(value, lga);
+    if (similarityScore > highestSimilarityScore) {
+      mostSimilarLga = lga;
+      highestSimilarityScore = similarityScore;
+    }
+  }
+
+  return mostSimilarLga;
+}
 
 const dataFormatter = (date) => {
-  const newDate = new Date(date);
+  // Replacing the escaped forward slashes with regular slashes
+  const cleanedDate = date.replace(/\\\//g, "/");
+  
+  //  split into required format
+  const [day, month, year] = cleanedDate.split('/');
+  const newDate = new Date(`${month}/${day}/${year}`);
+  
+  // Formatting the date as an ISO string
   const mongooseDate = newDate.toISOString();
-
+  
   return mongooseDate;
 };
 
@@ -48,7 +98,8 @@ const convertToJSOn = async () => {
     formRes.state = item["State"];
     formRes.lga = item["LGA"];
 
-    formRes.created_at = dataFormatter("2023/12/07");
+    // m/d/y
+    formRes.created_at = dataFormatter(item["Week Ending"]);
 
     formRes.foodItems.push(
       {
@@ -89,7 +140,7 @@ const convertToJSOn = async () => {
       {
         name: "Chicken_1-kg",
         brand: item[""],
-        price: item["Price of Rice - 50kg"],
+        price: item["Price of 1 kg of chicken"],
       },
       {
         name: "Beef_5-pieces",
@@ -166,17 +217,17 @@ const convertToJSOn = async () => {
 
     formRes.transports.push(
       {
-        route: item["Specify Route (e.g. Oshodi to Yaba)  Route 1"],
+        route: item["Specify Route (e.g. Oshodi to Yaba) Route 1"],
         mode: item["Mode of Transport for Route 1"],
         cost: item["Transport cost for Route 1"],
       },
       {
-        route: item["Specify Route (e.g. Oshodi to Yaba)  Route 2"],
+        route: item["Specify Route (e.g. Oshodi to Yaba) Route 2"],
         mode: item["Mode of Transport for Route 2"],
         cost: item["Transport cost for Route 2"],
       },
       {
-        route: item["Specify Route (e.g. Oshodi to Yaba)  Route 3"],
+        route: item["Specify Route (e.g. Oshodi to Yaba) Route 3"],
         mode: item["Mode of Transport for Route 3"],
         cost: item["Transport cost for Route 3"],
       }
@@ -241,7 +292,7 @@ const convertToJSOn = async () => {
       {
         name: "Petrol/PMS_1-Litre",
         brand: "",
-        price: item["Price of Petrol/PMS  (1 Liter)"],
+        price: item["Price of Petrol\/PMS (1 Liter)"],
       },
       {
         name: "Cement_50-kg",
@@ -282,9 +333,9 @@ const convertToJSOn = async () => {
 
             let newProduct = await new Product(
               {
-                created_by: `647f5b82ec8f57bbf6d96a4b`,
+                created_by: `648f78e424b0cb0c6d5fb0ef`,
                 state: state,
-                team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+                team_lead_id: `648f7332d1e46a487e874a0f`,
                 lga: lga,
                 name,
                 price,
@@ -313,9 +364,9 @@ const convertToJSOn = async () => {
 
             let newQuestion = await new Question(
               {
-                created_by: `647f5b82ec8f57bbf6d96a4b`,
+                created_by: `648f78e424b0cb0c6d5fb0ef`,
                 state: state,
-                team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+                team_lead_id: `648f7332d1e46a487e874a0f`,
                 lga: lga,
                 government_project,
                 comment_for_government_project,
@@ -339,9 +390,9 @@ const convertToJSOn = async () => {
 
             let newAccomodation = await new Accomodation(
               {
-                created_by: `647f5b82ec8f57bbf6d96a4b`,
+                created_by: `648f78e424b0cb0c6d5fb0ef`,
                 state: state,
-                team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+                team_lead_id: `648f7332d1e46a487e874a0f`,
                 lga: lga,
                 type,
                 rooms,
@@ -361,9 +412,9 @@ const convertToJSOn = async () => {
 
             let newElectricty = await new Electricity(
               {
-                created_by: `647f5b82ec8f57bbf6d96a4b`,
+                created_by: `648f78e424b0cb0c6d5fb0ef`,
                 state: state,
-                team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+                team_lead_id: `648f7332d1e46a487e874a0f`,
                 lga: lga,
                 hours_per_week,
                 created_at,
@@ -382,9 +433,9 @@ const convertToJSOn = async () => {
 
             let newTransport = await new Transport(
               {
-                created_by: `647f5b82ec8f57bbf6d96a4b`,
+                created_by: `648f78e424b0cb0c6d5fb0ef`,
                 state: state,
-                team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+                team_lead_id: `648f7332d1e46a487e874a0f`,
                 lga: lga,
                 route,
                 mode,
@@ -405,9 +456,9 @@ const convertToJSOn = async () => {
 
             let newOtherProduct = await new OtherProduct(
               {
-                created_by: `647f5b82ec8f57bbf6d96a4b`,
+                created_by: `648f78e424b0cb0c6d5fb0ef`,
                 state: state,
-                team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+                team_lead_id: `648f7332d1e46a487e874a0f`,
                 lga: lga,
                 name,
                 price,
@@ -425,9 +476,9 @@ const convertToJSOn = async () => {
         // parent entry
         const newEntry = await new Form(
           {
-            created_by: `647f5b82ec8f57bbf6d96a4b`,
+            created_by: `648f78e424b0cb0c6d5fb0ef`,
             state: state,
-            team_lead_id: `647e3f79ccaa6bef13f72f5b`,
+            team_lead_id: `648f7332d1e46a487e874a0f`,
             lga: lga,
             foodItems: food_ids,
             accomodations: accomodation_ids,
@@ -444,7 +495,7 @@ const convertToJSOn = async () => {
         // Commit the changes
         // await session.commitTransaction();
 
-        console.log("Success after putting everything.....", count, );
+        console.log("Success after putting everything.....", count);
         succes++;
         count++;
       } catch (error) {
@@ -455,7 +506,6 @@ const convertToJSOn = async () => {
         console.log("Error ", error, count);
         fail++;
         count++;
-
       }
     };
 

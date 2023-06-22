@@ -33,7 +33,7 @@ export const isAuthenticatedEnumerator = catchAsyncErrors(
         .json({ message: "Please log in to access this resource." });
     }
     const decoded = Jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
+    // console.log(decoded);
     req.enumerator = decoded.user;
     next();
   }
