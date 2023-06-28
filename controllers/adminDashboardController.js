@@ -146,7 +146,7 @@ export const getTeamLeadCount = async (req, res) => {
   }
 };
 export const getEnumeratorsCount = async (req, res) => {
-try {
+  try {
     const { yearFilter = "" } = req.query;
     const currentYear = yearFilter ? yearFilter : new Date().getFullYear();
     const months = [

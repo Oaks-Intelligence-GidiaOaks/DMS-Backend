@@ -242,7 +242,7 @@ export const getSubmissionTime = async (req, res) => {
       lga: {
         $in: req.user.LGA,
       },
-      created_at: { $gte: oneMonthAgo, $lte: today }
+      created_at: { $gte: oneMonthAgo, $lte: today },
     })
       .populate("created_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
@@ -307,7 +307,7 @@ export const getAllSubmissionTime = async (req, res) => {
     }
 
     // Query the database for the desired forms
-    Form.find({created_at: { $gte: oneMonthAgo, $lte: today }})
+    Form.find({ created_at: { $gte: oneMonthAgo, $lte: today } })
       .populate("updated_by", "id") // Populate the created_by field with the Enumerator model
       .exec((err, forms) => {
         if (err) {
