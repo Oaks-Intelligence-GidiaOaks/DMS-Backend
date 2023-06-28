@@ -607,6 +607,7 @@ export const getAllTeamLeadEnumerators = async (req, res) => {
       LGA: {
         $in: teamLead.LGA,
       },
+      disabled: false,
     });
 
     res.status(200).json({
