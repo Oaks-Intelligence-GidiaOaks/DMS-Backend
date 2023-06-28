@@ -67,6 +67,10 @@ const previousWeekNos = [
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
 
+const today = new Date();
+const oneMonthAgo = new Date();
+oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
 // Get the start and end timestamps of the current month
 const startOfMonth = new Date(currentYear, currentMonth - 1, 1);
 const endOfMonth = new Date(currentYear, currentMonth, 0, 23, 59, 59, 999);
@@ -77,6 +81,7 @@ export const getPriceFluctuation = async (req, res) => {
 
     const productsWithResult = await Product.find({
       lga: lgaFilter,
+      created_at: { $gte: oneMonthAgo, $lte: today },
     }).exec();
 
     const populatedProducts = await Promise.all(
