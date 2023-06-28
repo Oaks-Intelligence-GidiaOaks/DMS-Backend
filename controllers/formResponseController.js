@@ -279,10 +279,9 @@ export const getTransport = async (req, res) => {
   const skip = (currentPage - 1) * 10;
   try {
     const totalCount = await Transport.countDocuments(query);
-    const data = await Transport.find(query)
-      .populate("created_by")
-      .skip(skip)
-      .limit(10);
+    const data = await Transport.find(query).populate("created_by");
+    // .skip(skip)
+    // .limit(10);
 
     res.status(200).json({ data, totalCount });
   } catch (error) {
@@ -376,10 +375,9 @@ export const getAccomodation = async (req, res) => {
   const skip = (currentPage - 1) * 10;
   try {
     const totalCount = await Accomodation.countDocuments(query);
-    const data = await Accomodation.find(query)
-      .populate("created_by")
-      .skip(skip)
-      .limit(10);
+    const data = await Accomodation.find(query).populate("created_by");
+    // .skip(skip)
+    // .limit(10);
 
     res.status(200).json({ data, totalCount });
   } catch (error) {
@@ -465,10 +463,9 @@ export const getElectricity = async (req, res) => {
   const skip = (currentPage - 1) * 10;
   try {
     const totalCount = await Electricity.countDocuments(query);
-    const data = await Electricity.find(query)
-      .populate("created_by")
-      .skip(skip)
-      .limit(10);
+    const data = await Electricity.find(query).populate("created_by");
+    // .skip(skip)
+    // .limit(10);
 
     res.status(200).json({ data, totalCount });
   } catch (error) {
@@ -557,10 +554,9 @@ export const getQuestions = async (req, res) => {
   const skip = (currentPage - 1) * 10;
   try {
     const totalCount = await Question.countDocuments(query);
-    const data = await Question.find(query)
-      .populate("created_by")
-      .skip(skip)
-      .limit(10);
+    const data = await Question.find(query).populate("created_by");
+    // .skip(skip)
+    // .limit(10);
 
     res.status(200).json({ data, totalCount });
   } catch (error) {
@@ -668,10 +664,9 @@ export const getOtherProducts = async (req, res) => {
   const skip = (currentPage - 1) * 10;
   try {
     const totalCount = await OtherProduct.countDocuments(query);
-    const data = await OtherProduct.find(query)
-      .populate("created_by")
-      .skip(skip)
-      .limit(10);
+    const data = await OtherProduct.find(query).populate("created_by");
+    // .skip(skip)
+    // .limit(10);
 
     res.status(200).json({ data, totalCount });
   } catch (error) {
