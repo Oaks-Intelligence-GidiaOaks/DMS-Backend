@@ -1,2 +1,7 @@
 node_modules
 **/*.env
+allTeamLeads.js
+controllers/formSeed.js
+enumeratorsByLeads.js
+lgaRoutes.js
+seeder.js

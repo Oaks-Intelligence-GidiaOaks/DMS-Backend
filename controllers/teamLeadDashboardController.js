@@ -280,10 +280,10 @@ export const getSubmisionRate = async (req, res) => {
             { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
             currentWeek,
           ],
-          $eq: [
-            { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentYear,
-          ],
+          // $eq: [
+          //   { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+          //   // currentYear,
+          // ],
         },
       },
       additionalQueryParams,
@@ -292,9 +292,17 @@ export const getSubmisionRate = async (req, res) => {
 
   try {
     const totalSubmision = await Form.countDocuments(query);
-    const totalEnumerators = await Enumerator.countDocuments({
-      LGA: { $in: req.user.LGA },
-    });
+    const totalEnumerators = await Enumerator.countDocuments(
+      req.user.role === "team_lead"
+        ? {
+            LGA: { $in: req.user.LGA },
+            disabled: false,
+          }
+        : {
+            disabled: false,
+          }
+    );
+
     const notSubmited = totalEnumerators - totalSubmision;
     res
       .status(200)
