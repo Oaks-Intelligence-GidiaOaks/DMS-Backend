@@ -84,54 +84,114 @@ export const getPriceFluctuation = async (req, res) => {
       created_at: { $gte: oneMonthAgo, $lte: today },
     }).exec();
 
-    const populatedProducts = await Promise.all(
-      productsWithResult.map(async (product) => {
-        const { name } = product;
+    const populatedProducts = [];
+    for (const product of productsWithResult) {
+      const { name } = product;
 
-        const weeklyPrice = [];
-        let totalPrice = 0;
+      const existingProduct = populatedProducts.find((p) => p.name === name);
+      if (existingProduct) {
+        continue;
+      }
 
-        for (const weekNo of previousWeekNos) {
-          const weekStart = getWeekStartDate(currentDate.getFullYear(), weekNo);
-          const weekEnd = getWeekEndDate(currentDate.getFullYear(), weekNo);
+      const weeklyPrice = [];
+      let totalPrice = 0;
 
-          const weekPrice = await Product.findOne({
-            $and: [
-              {
-                $expr: {
-                  $eq: [
-                    {
-                      $week: { date: "$created_at", timezone: "Africa/Lagos" },
+      for (const weekNo of previousWeekNos) {
+        const weekStart = getWeekStartDate(currentDate.getFullYear(), weekNo);
+        const weekEnd = getWeekEndDate(currentDate.getFullYear(), weekNo);
+
+        const weekPrice = await Product.findOne({
+          $and: [
+            {
+              $expr: {
+                $eq: [
+                  {
+                    $week: {
+                      date: "$created_at",
+                      timezone: "Africa/Lagos",
                     },
-                    weekNo,
-                  ],
-                },
+                  },
+                  weekNo,
+                ],
               },
-              { lga: lgaFilter },
-              { name: name },
-            ],
-          })
-            .select("price")
-            .lean()
-            .exec();
+            },
+            { lga: lgaFilter },
+            { name: name },
+          ],
+        })
+          .select("price")
+          .lean()
+          .exec();
 
-          const price = weekPrice ? weekPrice.price : 0;
-          weeklyPrice.push({ x: weekNo, y: price });
-          totalPrice += price;
-        }
+        const price = weekPrice ? weekPrice.price : 0;
+        weeklyPrice.push({ x: weekNo, y: price });
+        totalPrice += price;
+      }
 
-        const priceChange = calculatePercentageChange(
-          weeklyPrice[3].y,
-          weeklyPrice[4].y
-        );
+      const priceChange = calculatePercentageChange(
+        weeklyPrice[3].y,
+        weeklyPrice[4].y
+      );
+      populatedProducts.push({
+        name,
+        weeklyPrice,
+        priceChange,
+      });
+    }
 
-        return {
-          name,
-          weeklyPrice,
-          priceChange,
-        };
-      })
-    );
+    // const populatedProducts = await Promise.all(
+    //   productsWithResult.map(async (product) => {
+    //     const { name } = product;
+    //     const existingProduct = populatedProducts.find((p) => p.name === name);
+    //     if (existingProduct) {
+    //       return null;
+    //     }
+
+    //     const weeklyPrice = [];
+    //     let totalPrice = 0;
+
+    //     for (const weekNo of previousWeekNos) {
+    //       const weekStart = getWeekStartDate(currentDate.getFullYear(), weekNo);
+    //       const weekEnd = getWeekEndDate(currentDate.getFullYear(), weekNo);
+
+    //       const weekPrice = await Product.findOne({
+    //         $and: [
+    //           {
+    //             $expr: {
+    //               $eq: [
+    //                 {
+    //                   $week: { date: "$created_at", timezone: "Africa/Lagos" },
+    //                 },
+    //                 weekNo,
+    //               ],
+    //             },
+    //           },
+    //           { lga: lgaFilter },
+    //           { name: name },
+    //         ],
+    //       })
+    //         .select("price")
+    //         .lean()
+    //         .exec();
+
+    //       const price = weekPrice ? weekPrice.price : 0;
+    //       weeklyPrice.push({ x: weekNo, y: price });
+    //       totalPrice += price;
+    //     }
+
+    //     const priceChange = calculatePercentageChange(
+    //       weeklyPrice[3].y,
+    //       weeklyPrice[4].y
+    //     );
+
+    //     return {
+    //       name,
+    //       weeklyPrice,
+    //       priceChange,
+    //     };
+    //   })
+    // );
+    // populatedProducts = populatedProducts.filter((product) => product !== null);
 
     res.status(200).json(populatedProducts);
 
