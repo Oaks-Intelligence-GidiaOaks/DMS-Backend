@@ -9,14 +9,19 @@ import catchAsyncErrors from "./catchAsyncError.js";
 export const isAuthenticatedUser = async (req, res, next) => {
   try {
     // const { token } = req.cookies;
-    const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+    const token =
+      req.headers.authorization && req.headers.authorization.split(" ")[1];
     if (!token) {
       res
         .status(401)
         .json({ message: "Please log in to access this resource." });
     }
     const decoded = Jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.user;
+    const user = await User.findById(decoded.user._id);
+    if (!user) {
+      res.status(401).json({ message: "User does not exist." });
+    }
+    req.user = user;
     next();
   } catch (err) {
     console.log(err);
