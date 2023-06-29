@@ -12,7 +12,7 @@ const sendToken = (user) => {
     //   httpOnly: true,
     // };
     const token = jwt.sign({ user: user }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "3d",
     });
     // res.status(statusCode).cookie("token", token, options).json({
     //   success: true,
