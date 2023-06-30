@@ -58,7 +58,7 @@ export const getResponseTracker = async (req, res) => {
   // const currentPage = page || 1;
   // const skip = (currentPage - 1) * 10;
   try {
-    let enumeratorIds;
+    let enumeratorIds = [];
     let results;
     const totalSubmision = await Form.countDocuments(query);
     const totalEnumerators = await Enumerator.countDocuments({
@@ -71,11 +71,12 @@ export const getResponseTracker = async (req, res) => {
         console.error("Error:", err);
         // res.status(500).json({ message: err.message });
       } else {
-        enumeratorIds = enumerators.map((enumerator) => enumerator._id);
-
+        const enumeratorIds = enumerators.reduce((accumulator, enumerator) => {
+          return accumulator.concat(enumerator.LGA);
+        }, []);
         //get response
         const data = Form.find({
-          created_by: { $in: enumeratorIds },
+          lga: { $in: enumeratorIds },
           $expr: {
             $eq: [
               { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
@@ -89,27 +90,47 @@ export const getResponseTracker = async (req, res) => {
             // Create a map of enumeratorId to response for easier lookup
             const responseMap = new Map();
             data.forEach((response) => {
-              responseMap.set(response.created_by.toString(), response);
+              const enumeratorId = response.created_by.toString();
+              if (responseMap.has(enumeratorId)) {
+                responseMap.get(enumeratorId).push(response);
+              } else {
+                responseMap.set(enumeratorId, [response]);
+              }
             });
             // Iterate through the enmerators and determine the status
-            results = enumerators.map((enumerator) => {
-              const response = responseMap.get(enumerator._id.toString());
-              const status = !!response;
-              const state = response ? response.state : null;
-              const lga = response ? response.lga : null;
-              const created_at = response ? response.created_at : null;
-              const form_id = response ? response._id : null;
+            results = enumerators.flatMap((enumerator) => {
+              const enumeratorId = enumerator._id.toString();
+              const responses = responseMap.get(enumeratorId) || [];
+              if (responses.length === 0) {
+                return {
+                  first_name: enumerator.firstName,
+                  last_name: enumerator.lastName,
+                  id: enumerator.id,
+                  state: null,
+                  lga: null,
+                  created_at: null,
+                  status: false,
+                  form_id: null,
+                };
+              }
+              return responses.map((response) => {
+                const status = true;
+                const state = response.state;
+                const lga = response.lga;
+                const created_at = response.created_at;
+                const form_id = response._id;
 
-              return {
-                first_name: enumerator.firstName,
-                last_name: enumerator.lastName,
-                id: enumerator.id,
-                state,
-                lga,
-                created_at,
-                status,
-                form_id,
-              };
+                return {
+                  first_name: enumerator.firstName,
+                  last_name: enumerator.lastName,
+                  id: enumerator.id,
+                  state,
+                  lga,
+                  created_at,
+                  status,
+                  form_id,
+                };
+              });
             });
             res.status(200).json({ results, totalEnumerators, totalSubmision });
           }
