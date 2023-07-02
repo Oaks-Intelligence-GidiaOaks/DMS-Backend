@@ -5,11 +5,19 @@ import {
   updateLgaRoute,
   deleteLgaRoute,
 } from "../controllers/lgaRouteController.js";
-import { isAuthenticatedUser } from "../middlewares/auth.js";
+import {
+  isAuthenticatedUser,
+  isAuthenticatedEnumerator,
+} from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.get("/lga_routes", isAuthenticatedUser, getLgaRoute);
+router.get(
+  "/lga_routes",
+  isAuthenticatedUser,
+  isAuthenticatedEnumerator,
+  getLgaRoute
+);
 router.post("/lga_routes", isAuthenticatedUser, createLgaRoute);
 router.patch("/lga_routes/:id", isAuthenticatedUser, updateLgaRoute);
 router.delete("/lga_routes/:id", isAuthenticatedUser, deleteLgaRoute);
