@@ -406,7 +406,7 @@ export const getAdminResponseTracker = async (req, res) => {
       additionalQueryParams,
     ],
   };
-
+  console.log(query);
   // const currentPage = page || 1;
   // const skip = (currentPage - 1) * 10;
   try {

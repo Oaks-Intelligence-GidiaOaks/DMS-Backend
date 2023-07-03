@@ -191,11 +191,16 @@ export const getAdminPriceFluctuation = async (req, res) => {
   }
 };
 export const getTeamLeadCount = async (req, res) => {
+  const query = {};
+  if (req?.user?.role === "admin") {
+    query.role = "team_lead";
+    query.disabled = false;
+  }
+  if (req?.user?.role === "super_admin") {
+    query.disabled = false;
+  }
   try {
-    const totalTeamLead = await User.countDocuments({
-      role: "team_lead",
-      disabled: false,
-    });
+    const totalTeamLead = await User.countDocuments(query);
     const newlyAdded = await User.countDocuments({
       createdAt: { $gte: startOfMonth, $lt: endOfMonth },
       role: "team_lead",
