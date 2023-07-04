@@ -542,15 +542,20 @@ export const getAllUsers = async (req, res) => {
 
 // Get all teamlead => api/v1/admin/team_lead ****
 export const getAllTeamLead = async (req, res) => {
-  const totalTeamLead = await User.countDocuments({
-    role: "team_lead",
-    disabled: false,
-  });
+  const query = {};
+  if (req?.user?.role === "admin") {
+    query.role = "team_lead";
+    query.disabled = false;
+  }
+  if (req?.user?.role === "super_admin") {
+    query.disabled = false;
+  }
+  const totalTeamLead = await User.countDocuments(query);
   const newlyAdded = await User.countDocuments({
     createdAt: { $gte: startOfMonth, $lt: endOfMonth },
     role: "team_lead",
   });
-  const users = await User.find({ role: "team_lead", disabled: false });
+  const users = await User.find(query);
 
   res.status(200).json({
     success: true,
