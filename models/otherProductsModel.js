@@ -20,6 +20,7 @@ const otherProductSchema = new Schema({
   name: { type: String, required: true },
   price: { type: String, required: true },
   brand: { type: String },
+  size: { type: String },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });
