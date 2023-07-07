@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import moment from "moment";
+import AuditTrail from "./auditTrailModel.js";
 
 const { Schema, model } = mongoose;
 
@@ -114,6 +115,28 @@ EnumeratorSchema.methods.getJwtToken = function () {
     expiresIn: process.env.JWT_SECRET_EXPIRES,
   });
 };
+
+// populate audit trail
+EnumeratorSchema.pre("save", function (next) {
+  if (this.isNew) {
+    // Document is new, store "create" action
+    const auditTrailEntry = new AuditTrail({
+      collectionName: "Enumerator",
+      documentId: this._id,
+      action: "create",
+    });
+    auditTrailEntry.save();
+  } else {
+    // Document is being updated, store "update" action
+    const auditTrailEntry = new AuditTrail({
+      collectionName: "Enumerator",
+      documentId: this._id,
+      action: "update",
+    });
+    auditTrailEntry.save();
+  }
+  next();
+});
 
 // Create a model from the schema and export
 export default model("Enumerator", EnumeratorSchema);
