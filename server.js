@@ -15,6 +15,7 @@ import enumeratorRoute from "./routes/enumeratorRoutes.js";
 import lgaRoutes from "./routes/lgaRoutes.js";
 import teamLeadDashboardRoutes from "./routes/teamLeadDashboardRoute.js";
 import adminDashboardRoutes from "./routes/adminDashboardRoute.js";
+import auditLogRoutes from "./routes/auditLogRoute.js";
 
 // env config
 dotenv.config({
@@ -77,6 +78,7 @@ app.use("/api/v1/", enumeratorRoute);
 app.use("/api/v1/", lgaRoutes);
 app.use("/api/v1/team_lead_dashboard", teamLeadDashboardRoutes);
 app.use("/api/v1/admin_dashboard", adminDashboardRoutes);
+app.use("/api/v1/audit_log", auditLogRoutes);
 
 // Error handling middleware
 app.use(errorMiddleWare);

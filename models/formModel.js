@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import AuditTrail from "./auditTrailModel.js";
 
 import { Schema, model } from "mongoose";
 
@@ -61,6 +62,28 @@ const FormSchema = new Schema({
   ],
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
+});
+
+// populate audit trail
+FormSchema.pre("save", function (next) {
+  if (this.isNew) {
+    // Document is new, store "create" action
+    const auditTrailEntry = new AuditTrail({
+      collectionName: "Form",
+      documentId: this._id,
+      action: "create",
+    });
+    auditTrailEntry.save();
+  } else {
+    // Document is being updated, store "update" action
+    const auditTrailEntry = new AuditTrail({
+      collectionName: "Form",
+      documentId: this._id,
+      action: "update",
+    });
+    auditTrailEntry.save();
+  }
+  next();
 });
 
 export default model("Form", FormSchema);

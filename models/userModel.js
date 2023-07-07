@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import AuditTrail from "./auditTrailModel.js";
 
 const { Schema, model } = mongoose;
 
@@ -138,5 +139,27 @@ userSchema.methods.getResetPasswordToken = function () {
 
   return resetPasswordToken;
 };
+
+// populate audit trail
+userSchema.pre("save", function (next) {
+  if (this.isNew) {
+    // Document is new, store "create" action
+    const auditTrailEntry = new AuditTrail({
+      collectionName: "User",
+      documentId: this._id,
+      action: "create",
+    });
+    auditTrailEntry.save();
+  } else {
+    // Document is being updated, store "update" action
+    const auditTrailEntry = new AuditTrail({
+      collectionName: "User",
+      documentId: this._id,
+      action: "update",
+    });
+    auditTrailEntry.save();
+  }
+  next();
+});
 
 export default model("User", userSchema);
