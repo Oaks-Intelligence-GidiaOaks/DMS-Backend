@@ -41,11 +41,11 @@ export const getMasterListData = async (req, res) => {
     const total = await Form.countDocuments(query);
     const forms = await Form.find(query)
       .sort({ created_at: -1 }) // Sort by created_at in descending order
-      .populate("foodItems", "name brand price") // Populate foodItems and select the name, brand, and price fields
+      .populate("foodItems", "name brand price size") // Populate foodItems and select the name, brand, and price fields
       .populate("accomodations", "type rooms price") // Populate accomodations and select the name, propertyType, and price fields
       .populate("transports", "route mode cost") // Populate transports and select the name, mode, and cost fields
       .populate("electricity", "hours_per_week") // Populate electricity and select the name, type, and voltage fields
-      .populate("others", "name brand price") // Populate electricity and select the name, type, and voltage fields
+      .populate("others", "name brand price size") // Populate electricity and select the name, type, and voltage fields
       .populate("clothings", "category sub_category size price") // Populate electricity and select the name, type, and voltage fields
       .populate(
         "questions",

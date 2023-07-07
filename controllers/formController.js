@@ -51,7 +51,7 @@ export const addFormData = async (req, res) => {
       // food items
       let food_ids = await Promise.all(
         foodItems.map(async (item, index) => {
-          const { name, price, brand } = item;
+          const { name, price, brand, size } = item;
 
           let newProduct = await new Product({
             created_by: req.enumerator._id,
@@ -62,6 +62,7 @@ export const addFormData = async (req, res) => {
             name,
             price,
             brand,
+            size,
           }).save();
 
           return newProduct._id;
@@ -157,7 +158,7 @@ export const addFormData = async (req, res) => {
       // other products
       let other_product_ids = await Promise.all(
         others.map(async (item, index) => {
-          const { name, price, brand } = item;
+          const { name, price, brand, size } = item;
 
           let newOtherProduct = await new OtherProduct({
             created_by: req.enumerator._id,
@@ -168,6 +169,7 @@ export const addFormData = async (req, res) => {
             name,
             price,
             brand,
+            size,
           }).save();
 
           return newOtherProduct._id;
