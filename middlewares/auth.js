@@ -24,7 +24,7 @@ export const isAuthenticatedUser = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.log(err);
+    res.status(401).json({ message: err.message });
   }
 };
 
@@ -42,7 +42,7 @@ export const isAuthenticatedEnumerator = catchAsyncErrors(
       req.enumerator = decoded.user;
       next();
     } catch (error) {
-      console.log(err);
+      res.status(401).json({ message: err.message });
     }
   }
 );
