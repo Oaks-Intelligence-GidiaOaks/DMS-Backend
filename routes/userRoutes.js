@@ -23,6 +23,7 @@ import {
   updateEnumeratorProfileAdmin,
   getAllTeamLeadEnumerators,
   getEnumeratorProfile,
+  testLoginUser,
   // clearDb,
 } from "../controllers/userController.js";
 import {
@@ -36,6 +37,7 @@ const router = express.Router();
 router.post("/user/new", createUser);
 router.post("/enumerator/new", isAuthenticatedUser, createEnumerator);
 router.post("/login", loginUser);
+router.post("/test_login", testLoginUser);
 
 // router.post("/password/forgot", forgotPassword);
 router.put("/password/reset", isAuthenticatedUser, resetPassword);

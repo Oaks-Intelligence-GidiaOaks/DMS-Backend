@@ -331,12 +331,17 @@ export const getPriceFluctuation = async (req, res) => {
 
 export const getSubmisionRate = async (req, res) => {
   const additionalQueryParams = {};
+  const query2 = {};
   if (req?.user?.role === "team_lead") {
     // additionalQueryParams.team_lead_id = req.user._id;
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
+    query2.LGA = {
+      $in: req.user.LGA,
+    };
   }
+  query2.disabled = false;
   const query = {
     $and: [
       {
@@ -357,21 +362,13 @@ export const getSubmisionRate = async (req, res) => {
 
   try {
     const totalSubmision = await Form.countDocuments(query);
-    const totalEnumerators = await Enumerator.countDocuments(
-      req.user.role === "team_lead"
-        ? {
-            LGA: { $in: req.user.LGA },
-            disabled: false,
-          }
-        : {
-            disabled: false,
-          }
-    );
+    const totalEnumerators = await Enumerator.countDocuments(query2);
 
     const notSubmited = totalEnumerators - totalSubmision;
-    res
-      .status(200)
-      .json({ submited: totalSubmision, notSubmited: notSubmited });
+    res.status(200).json({
+      submited: totalSubmision,
+      notSubmited: notSubmited,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
