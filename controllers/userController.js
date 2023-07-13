@@ -259,6 +259,54 @@ export const loginUser = async (req, res) => {
   }
 };
 
+// test Login user api/v1/test_login ****
+export const testLoginUser = async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // find user in database
+    const user = await User.findOne({ id });
+
+    if (user) {
+      // return eror if user/enumerator dont exist in db
+      if (!user) {
+        return res.status(401).json({
+          message: "Invalid Id, please try again",
+        });
+      }
+
+      if (user.disabled) {
+        return res.status(401).json({
+          message:
+            "Your account has been disabled. Please contact the administrator for assistance",
+        });
+      }
+      const token = sendToken(user);
+      res.status(200).json({ user, token });
+    } else {
+      const enumerator = await Enumerator.findOne({ id });
+
+      if (!enumerator) {
+        return res.status(401).json({
+          message: "Invalid Id or password, please try again",
+        });
+      }
+
+      if (enumerator.disabled) {
+        return res.status(401).json({
+          message:
+            "Your account has been disabled. Please contact the administrator for assistance",
+        });
+      }
+
+      const token = sendToken(enumerator);
+      res.status(200).json({ user: enumerator, token });
+    }
+  } catch (error) {
+    res.status(401).json({ message: error.message, stack: error.stack });
+  }
+};
+
 // Forgot password => api/v1/password/reset ****
 // export const forgotPassword = async (req, res) => {
 //   const user = await User.findOne({ email: req.body.email });
