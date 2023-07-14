@@ -98,13 +98,14 @@ export const getFoodProduct = async (req, res) => {
 export const updateFoodProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, brand } = req.body;
+    const { name, price, brand, size } = req.body;
     await Product.findByIdAndUpdate(
       { _id: id },
       {
         name,
         brand,
         price,
+        size,
         updated_by: req.user._id,
       }
     );
@@ -679,13 +680,14 @@ export const getOtherProducts = async (req, res) => {
 export const updateOtherProducts = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, brand } = req.body;
+    const { name, price, brand, size } = req.body;
     await OtherProduct.findByIdAndUpdate(
       { _id: id },
       {
         name,
         brand,
         price,
+        size,
         updated_by: req.user._id,
       }
     );
