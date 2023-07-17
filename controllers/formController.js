@@ -46,7 +46,7 @@ export const addFormData = async (req, res) => {
     };
     const alreadySubmited = await Form.find(query);
     if (alreadySubmited.length > 0) {
-      res.status(401).json({ message: "Already submitted for this week" });
+      res.status(403).json({ message: "Already submitted for this week" });
     } else {
       // food items
       let food_ids = await Promise.all(
