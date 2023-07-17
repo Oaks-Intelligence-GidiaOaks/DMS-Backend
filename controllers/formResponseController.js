@@ -16,8 +16,14 @@ import "../utils/dateUtils.js";
 //   const now = new Date();
 //   return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
 // }
-const currentWeek = new Date().getWeek();
 
+// Helper function to get the week number of a given date
+const getWeekNumber = (date) => {
+  const onejan = new Date(date.getFullYear(), 0, 1);
+  return Math.ceil(((date - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+};
+
+const currentWeek = getWeekNumber(new Date());
 // get food product api/v1/form_response/food_product
 export const getFoodProduct = async (req, res) => {
   const {

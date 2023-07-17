@@ -23,7 +23,9 @@ function getWeekNumber(date) {
   );
 }
 
-const currentWeek = new Date().getWeek();
+const currentWeek = getWeekNumber(new Date());
+
+// const currentWeek = new Date().getWeek();
 const today = new Date();
 const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
