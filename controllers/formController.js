@@ -11,7 +11,13 @@ import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import "../utils/dateUtils.js";
 
-const currentWeek = new Date().getWeek();
+// Helper function to get the week number of a given date
+const getWeekNumber = (date) => {
+  const onejan = new Date(date.getFullYear(), 0, 1);
+  return Math.ceil(((date - onejan) / 86400000 + onejan.getDay() + 1) / 7);
+};
+
+const currentWeek = getWeekNumber(new Date());
 
 // add form response data api/v1/form/add_data
 // export const addFormData = catchAsyncErrors(async (req, res, next) => {
