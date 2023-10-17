@@ -3,29 +3,33 @@ import mongoose from "mongoose";
 
 export const getAuditLog = async (req, res) => {
   try {
-    const { page } = req.query;
-    const currentPage = page || 1;
-    const skip = (currentPage - 1) * 10;
+    const { page = 1, limit = 20 } = req.query;
 
-    const total = await AuditTrail.countDocuments();
-    // Query the AuditTrail model and populate the documentId field dynamically based on the collectionName
-    const auditTrails = await AuditTrail.find()
-      .populate({
-        path: "documentId",
-        model: function (doc) {
-          return mongoose.model(doc.collectionName); // Use the collectionName field to dynamically select the model
-        },
-      })
-      .skip(skip)
-      .limit(10);
-    res.status(200).json({ total, auditTrails });
-    //   .exec((err, auditTrails) => {
-    //     if (err) {
-    //       console.error(err);
-    //     } else {
-    //       console.log(auditTrails);
-    //     }
-    //   });
+    const currentPage = parseInt(page);
+    const pageLimit = parseInt(limit);
+    const skip = (currentPage - 1) * pageLimit;
+
+    const [result, total] = await Promise.all([
+      AuditTrail.find({})
+        .populate({
+          path: "documentId",
+          populate: {
+            path: "organization_id craeted_by updated_by",
+          },
+        })
+        .skip(skip)
+        .limit(pageLimit)
+        .sort({ createdAt: -1 }),
+
+      AuditTrail.countDocuments({}),
+    ]);
+
+    res.status(200).json({
+      result,
+      currentPage,
+      totalPages: Math.ceil(total / pageLimit),
+      totalRecords: total,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
