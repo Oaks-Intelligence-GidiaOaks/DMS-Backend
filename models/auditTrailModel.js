@@ -12,6 +12,7 @@ const auditTrailSchema = new Schema(
     },
     documentId: {
       type: mongoose.Schema.Types.ObjectId,
+      refPath: "collectionName",
     },
   },
   { timestamps: true }
