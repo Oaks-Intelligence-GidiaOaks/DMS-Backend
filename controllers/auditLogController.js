@@ -25,29 +25,36 @@ export const createAuditLog = async ({
 export const getAuditLog = async (req, res) => {
   const ipAddress = req.socket.remoteAddress;
   try {
-    const { page = 1, limit = 20, date } = req.query;
+    const { page = 1, limit = 20, start, end } = req.query;
 
     const currentPage = parseInt(page);
     const pageLimit = parseInt(limit);
     const skip = (currentPage - 1) * pageLimit;
 
     let query = {};
-    if (date) {
-      const startDate = new Date(date);
+    if (start && end) {
+      const startDate = new Date(start);
       startDate.setHours(0, 0, 0, 0);
 
-      const endDate = new Date(date);
+      const endDate = new Date(end);
       endDate.setHours(23, 59, 59, 999);
 
       query.createdAt = { $gte: startDate, $lte: endDate };
     } else {
       const currentDate = new Date();
-      currentDate.setHours(0, 0, 0, 0);
+      const firstDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        1
+      );
+      const lastDayOfMonth = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth() + 1,
+        0
+      );
+      lastDayOfMonth.setHours(23, 59, 59, 999);
 
-      const nextDate = new Date();
-      nextDate.setHours(23, 59, 59, 999);
-
-      query.createdAt = { $gte: currentDate, $lte: nextDate };
+      query.createdAt = { $gte: firstDayOfMonth, $lte: lastDayOfMonth };
     }
 
     const [result, total] = await Promise.all([
