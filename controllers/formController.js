@@ -10,6 +10,7 @@ import Clothing from "../models/clothingModel.js";
 import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import "../utils/dateUtils.js";
+import { createAuditLog } from "./auditLogController.js";
 
 // Helper function to get the week number of a given date
 const getWeekNumber = (date) => {
@@ -22,6 +23,7 @@ const currentWeek = getWeekNumber(new Date());
 // add form response data api/v1/form/add_data
 // export const addFormData = catchAsyncErrors(async (req, res, next) => {
 export const addFormData = async (req, res) => {
+  const ipAddress = req.socket.remoteAddress;
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -219,6 +221,18 @@ export const addFormData = async (req, res) => {
         clothings: clothing_ids,
         // created_at: new Date().toISOString(),
       }).save();
+
+      const logData = {
+        title: "Submission",
+        description: `Enumerator made submissions for ${
+          lga ? lga : req.enumerator.LGA[0]
+        }`,
+        name: req.enumerator.firstName,
+        id: req.enumerator.id,
+        ip_address: ipAddress,
+      };
+
+      await createAuditLog(logData);
 
       // Commit the changes
       await session.commitTransaction();

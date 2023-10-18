@@ -13,6 +13,7 @@ import catchAsyncErrors from "../middlewares/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import APIQueries from "../utils/apiQueries.js";
 import "../utils/dateUtils.js";
+import { createAuditLog } from "./auditLogController.js";
 
 // Helper function to calculate the week number for a given date
 function getWeekNumber(date) {
@@ -150,6 +151,7 @@ export const getResponseTracker = async (req, res) => {
 export const approveResponse = async (req, res) => {
   // const session = await mongoose.startSession();
   // session.startTransaction();
+  const ipAddress = req.socket.remoteAddress;
   try {
     const { ids } = req.body;
     let data = await Promise.all(
@@ -158,6 +160,15 @@ export const approveResponse = async (req, res) => {
         formData.approved = 1;
         formData.updated_by = req.user._id;
         await formData.save();
+        const logData = {
+          title: "Submission",
+          description: `Team Lead made submissions for ${formData.lga}`,
+          name: req.user.firstName,
+          id: req.user.id,
+          ip_address: ipAddress,
+        };
+
+        await createAuditLog(logData);
         let foodData = await Promise.all(
           formData.foodItems.map(async (item) => {
             let fd = await Product.findById(item.toString());

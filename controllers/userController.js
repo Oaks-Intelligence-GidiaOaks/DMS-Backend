@@ -8,6 +8,7 @@ import sendEmail from "../utils/sendEmail.js";
 import cloudinary from "cloudinary";
 import error from "../middlewares/error.js";
 import { request } from "express";
+import { createAuditLog } from "./auditLogController.js";
 
 const currentDate = new Date();
 const currentYear = currentDate.getFullYear();
@@ -187,6 +188,7 @@ export const createEnumerator = async (req, res) => {
 
 // Login user api/v1/login ****
 export const loginUser = async (req, res) => {
+  const ipAddress = req.socket.remoteAddress;
   try {
     const { id, password } = req.body;
 
@@ -218,6 +220,15 @@ export const loginUser = async (req, res) => {
       const token = passwordMatch && sendToken(user);
 
       if (passwordMatch) {
+        const logData = {
+          title: "Login",
+          description: `User logged in`,
+          name: user.firstName,
+          id: user.id,
+          ip_address: ipAddress,
+        };
+
+        await createAuditLog(logData);
         res.status(200).json({ user, token });
       } else {
         res.status(401).json({
@@ -246,6 +257,15 @@ export const loginUser = async (req, res) => {
       const token = passwordMatch && sendToken(enumerator);
 
       if (passwordMatch) {
+        const logData = {
+          title: "Login",
+          description: `Enumerator logged in`,
+          name: enumerator.firstName,
+          id: enumerator.id,
+          ip_address: ipAddress,
+        };
+
+        await createAuditLog(logData);
         res.status(200).json({ user: enumerator, token });
       } else {
         res.status(401).json({
@@ -261,6 +281,7 @@ export const loginUser = async (req, res) => {
 
 // test Login user api/v1/test_login ****
 export const testLoginUser = async (req, res) => {
+  const ipAddress = req.socket.remoteAddress;
   try {
     const { id } = req.body;
 
@@ -282,6 +303,15 @@ export const testLoginUser = async (req, res) => {
         });
       }
       const token = sendToken(user);
+      const logData = {
+        title: "Login",
+        description: `User logged in`,
+        name: user.firstName,
+        id: user.id,
+        ip_address: ipAddress,
+      };
+
+      await createAuditLog(logData);
       res.status(200).json({ user, token });
     } else {
       const enumerator = await Enumerator.findOne({ id });
