@@ -25,16 +25,34 @@ export const createAuditLog = async ({
 export const getAuditLog = async (req, res) => {
   const ipAddress = req.socket.remoteAddress;
   try {
-    const { page = 1, limit = 20 } = req.query;
+    const { page = 1, limit = 20, date } = req.query;
 
     const currentPage = parseInt(page);
     const pageLimit = parseInt(limit);
     const skip = (currentPage - 1) * pageLimit;
 
-    const [result, total] = await Promise.all([
-      AuditLog.find({}).skip(skip).limit(pageLimit).sort({ createdAt: -1 }),
+    let query = {};
+    if (date) {
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
 
-      AuditLog.countDocuments({}),
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+
+      query.createdAt = { $gte: startDate, $lte: endDate };
+    } else {
+      const currentDate = new Date();
+      currentDate.setHours(0, 0, 0, 0);
+
+      const nextDate = new Date();
+      nextDate.setHours(23, 59, 59, 999);
+
+      query.createdAt = { $gte: currentDate, $lte: nextDate };
+    }
+
+    const [result, total] = await Promise.all([
+      AuditLog.find(query).skip(skip).limit(pageLimit).sort({ createdAt: -1 }),
+      AuditLog.countDocuments(query),
     ]);
 
     res.status(200).json({
