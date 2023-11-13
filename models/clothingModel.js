@@ -21,6 +21,10 @@ const clothingSchema = new Schema({
   sub_category: { type: String, required: true },
   size: { type: String, required: true },
   price: { type: Number, required: true },
+  flagged: {
+    type: Boolean,
+    default: false,
+  },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });

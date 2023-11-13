@@ -33,6 +33,10 @@ const questionSchema = new Schema({
   },
   note: { type: String },
   team_lead_note: { type: String },
+  flagged: {
+    type: Boolean,
+    default: false,
+  },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });

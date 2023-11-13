@@ -21,6 +21,10 @@ const otherProductSchema = new Schema({
   price: { type: String, required: true },
   brand: { type: String },
   size: { type: String },
+  flagged: {
+    type: Boolean,
+    default: false,
+  },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });
