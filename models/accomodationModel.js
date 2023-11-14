@@ -20,6 +20,10 @@ const accomodationSchema = new Schema({
   team_lead_id: { type: String, required: true },
   rooms: { type: Number, required: true },
   price: { type: String, required: true },
+  flagged: {
+    type: Boolean,
+    default: false,
+  },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });

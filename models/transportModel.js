@@ -20,6 +20,10 @@ const transportSchema = new Schema({
   route: { type: String, required: true },
   mode: { type: String, required: true },
   cost: { type: String, required: true },
+  flagged: {
+    type: Boolean,
+    default: false,
+  },
   created_at: { type: Date, default: new Date() },
   updated_at: { type: Date, default: new Date() },
 });

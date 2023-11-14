@@ -48,9 +48,19 @@ export const getResponseTracker = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -258,6 +268,122 @@ export const approveResponse = async (req, res) => {
   }
 };
 
+export const flagResponse = async (req, res) => {
+  const ipAddress = req.socket.remoteAddress;
+  try {
+    const { ids } = req.body;
+    let data = await Promise.all(
+      ids.map(async (id) => {
+        let formData = await Form.findById(id);
+        formData.approved = 0;
+        formData.flagged = true;
+        formData.updated_by = req.user._id;
+        await formData.save();
+        const logData = {
+          title: "Submission",
+          description: `Admin flagged a submissions for ${formData.lga}`,
+          name: req.user.firstName,
+          id: req.user.id,
+          ip_address: ipAddress,
+        };
+
+        await createAuditLog(logData);
+        let foodData = await Promise.all(
+          formData.foodItems.map(async (item) => {
+            let fd = await Product.findById(item.toString());
+            fd.approved = 0;
+            fd.flagged = true;
+            fd.updated_by = req.user._id;
+            await fd.save();
+            return fd;
+          })
+        );
+        let clothingData = await Promise.all(
+          formData.clothings.map(async (item) => {
+            let ctd = await Clothing.findById(item.toString());
+            ctd.approved = 0;
+            ctd.flagged = true;
+            ctd.updated_by = req.user._id;
+            await ctd.save();
+            return ctd;
+          })
+        );
+        let transportData = await Promise.all(
+          formData.transports.map(async (item) => {
+            let td = await Transport.findById(item.toString());
+            td.approved = 0;
+            td.flagged = true;
+            td.updated_by = req.user._id;
+            await td.save();
+            return td;
+          })
+        );
+        let accomodationData = await Promise.all(
+          formData.accomodations.map(async (item) => {
+            let ad = await Accomodation.findById(item.toString());
+            ad.approved = 0;
+            ad.flagged = true;
+            ad.updated_by = req.user._id;
+            await ad.save();
+            return ad;
+          })
+        );
+        let electricityData = await Promise.all(
+          formData.electricity.map(async (item) => {
+            let ed = await Electricity.findById(item.toString());
+            ed.approved = 0;
+            ed.flagged = true;
+            ed.updated_by = req.user._id;
+            await ed.save();
+            return ed;
+          })
+        );
+        let questionData = await Promise.all(
+          formData.questions.map(async (item) => {
+            let qd = await Question.findById(item.toString());
+            qd.approved = 0;
+            qd.flagged = true;
+            qd.updated_by = req.user._id;
+            await qd.save();
+            return qd;
+          })
+        );
+        let otherData = await Promise.all(
+          formData.others.map(async (item) => {
+            let od = await OtherProduct.findById(item.toString());
+            od.approved = 0;
+            od.flagged = true;
+            od.updated_by = req.user._id;
+            await od.save();
+            return od;
+          })
+        );
+        return {
+          foodData,
+          transportData,
+          accomodationData,
+          electricityData,
+          questionData,
+          otherData,
+          formData,
+          clothingData,
+        };
+      })
+    );
+    // await session.commitTransaction();
+    res
+      .status(200)
+      .json({ message: "Form response flagged successfully", data });
+  } catch (error) {
+    // Rollback any changes made in the database
+    // await session.abortTransaction();
+    res.status(500).json({ message: error.message });
+  } finally {
+    // Ending the session
+    // session.endSession();
+  }
+};
+
 export const getSubmissionTime = async (req, res) => {
   try {
     const currentDate = new Date();
@@ -410,9 +536,19 @@ export const getAdminResponseTracker = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$updated_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },

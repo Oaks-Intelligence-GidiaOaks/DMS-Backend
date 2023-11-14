@@ -24,6 +24,13 @@ const getWeekNumber = (date) => {
 };
 
 const currentWeek = getWeekNumber(new Date());
+
+const threeWeeksAgo = new Date();
+threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21); // 7 days * 3 weeks
+const startOfWeekThreeWeeksAgo = getWeekNumber(threeWeeksAgo);
+const startOfWeekTwoWeeksAgo = startOfWeekThreeWeeksAgo + 1;
+const startOfWeekPreviousWeek = startOfWeekThreeWeeksAgo + 2;
+
 // get food product api/v1/form_response/food_product
 export const getFoodProduct = async (req, res) => {
   const {
@@ -73,9 +80,19 @@ export const getFoodProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -100,6 +117,54 @@ export const getFoodProduct = async (req, res) => {
   }
 };
 
+export const getPrevFoodProduct = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await Product.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 //update food product api/v1/form_response/food_product/id
 export const updateFoodProduct = async (req, res) => {
   try {
@@ -116,11 +181,29 @@ export const updateFoodProduct = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Food Product updated sucessfully" });
+    res.status(200).json({ message: "Food Product flagged sucessfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagFoodProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "Food Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // get food product api/v1/form_response/clothings
 export const getClothingProduct = async (req, res) => {
   const {
@@ -174,9 +257,19 @@ export const getClothingProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -196,6 +289,72 @@ export const getClothingProduct = async (req, res) => {
     // .limit(20);
 
     res.status(200).json({ data, totalCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getPrevClothingProduct = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await Clothing.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagClothingProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Clothing.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "Clothing Product flagged sucessfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -273,9 +432,19 @@ export const getTransport = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -293,6 +462,72 @@ export const getTransport = async (req, res) => {
     res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getPrevTransport = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await Transport.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagTransport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Transport.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "transport Product flagged sucessfully" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -368,9 +603,19 @@ export const getAccomodation = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -389,6 +634,74 @@ export const getAccomodation = async (req, res) => {
     res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getPrevAccomodation = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await Accomodation.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagAccomodation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Accomodation.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res
+      .status(200)
+      .json({ message: "accomodation Product flagged sucessfully" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -456,9 +769,19 @@ export const getElectricity = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -477,6 +800,74 @@ export const getElectricity = async (req, res) => {
     res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getPrevElectricity = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await Electricity.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagElectricity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Electricity.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res
+      .status(200)
+      .json({ message: "electricity Product flagged sucessfully" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -547,9 +938,19 @@ export const getQuestions = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -568,6 +969,72 @@ export const getQuestions = async (req, res) => {
     res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getPrevQuestion = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await Question.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Question.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "question Product flagged sucessfully" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -657,9 +1124,19 @@ export const getOtherProducts = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -678,6 +1155,72 @@ export const getOtherProducts = async (req, res) => {
     res.status(200).json({ data, totalCount });
   } catch (error) {
     // return next(new ErrorHandler(error.message, 500));
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getPrevOtherProduct = async (req, res) => {
+  const additionalQueryParams = {};
+  if (req?.user?.role === "team_lead") {
+    additionalQueryParams.lga = {
+      $in: req.user.LGA,
+    };
+    additionalQueryParams.approved = 0;
+  }
+  if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    additionalQueryParams.approved = 1;
+  }
+  const query = {
+    $and: [
+      {
+        $expr: {
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
+          ],
+        },
+      },
+      additionalQueryParams,
+    ],
+  };
+
+  try {
+    const data = await OtherProduct.find(query);
+
+    res.status(200).json({ data });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const flagOtherProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await OtherProduct.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "other Product flagged sucessfully" });
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
