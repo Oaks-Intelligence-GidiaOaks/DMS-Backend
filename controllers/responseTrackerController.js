@@ -48,9 +48,19 @@ export const getResponseTracker = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -526,9 +536,19 @@ export const getAdminResponseTracker = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$updated_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },

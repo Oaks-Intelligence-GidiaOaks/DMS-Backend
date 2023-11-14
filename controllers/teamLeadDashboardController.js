@@ -346,14 +346,20 @@ export const getSubmisionRate = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
-          // $eq: [
-          //   { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-          //   // currentYear,
-          // ],
         },
       },
       additionalQueryParams,

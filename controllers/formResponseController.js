@@ -80,9 +80,19 @@ export const getFoodProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -237,9 +247,19 @@ export const getClothingProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -392,9 +412,19 @@ export const getTransport = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -543,9 +573,19 @@ export const getAccomodation = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -689,9 +729,19 @@ export const getElectricity = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -838,9 +888,19 @@ export const getQuestions = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
@@ -1004,9 +1064,19 @@ export const getOtherProducts = async (req, res) => {
     $and: [
       {
         $expr: {
-          $eq: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            currentWeek,
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $eq: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                currentWeek,
+              ],
+            },
           ],
         },
       },
