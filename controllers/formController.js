@@ -56,6 +56,9 @@ export const addFormData = async (req, res) => {
                   currentWeek,
                 ],
               },
+              {
+                lga: lga ? lga : req.enuumerator.LGA[0],
+              },
             ],
           },
         },
@@ -215,6 +218,22 @@ export const addFormData = async (req, res) => {
           return newClothing._id;
         })
       );
+
+      console.log({
+        created_by: req.enumerator._id,
+        region: req.enumerator?.region,
+        state: req.enumerator.state,
+        team_lead_id: req.enumerator.user,
+        lga: lga ? lga : req.enumerator.LGA[0],
+        foodItems: food_ids,
+        accomodations: accomodation_ids,
+        transports: transport_ids,
+        electricity: electricity_ids,
+        others: other_product_ids,
+        questions: questions_ids,
+        clothings: clothing_ids,
+        // created_at: new Date().toISOString(),
+      });
 
       // parent entry
       const newEntry = await new Form({
