@@ -132,13 +132,23 @@ export const getPrevFoodProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
@@ -299,13 +309,23 @@ export const getPrevClothingProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
@@ -461,13 +481,23 @@ export const getPrevTransport = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
@@ -623,13 +653,23 @@ export const getPrevAccomodation = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
@@ -779,13 +819,23 @@ export const getPrevElectricity = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
@@ -938,13 +988,23 @@ export const getPrevQuestion = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
@@ -1114,13 +1174,23 @@ export const getPrevOtherProduct = async (req, res) => {
     $and: [
       {
         $expr: {
-          $in: [
-            { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            [
-              startOfWeekThreeWeeksAgo,
-              startOfWeekTwoWeeksAgo,
-              startOfWeekPreviousWeek,
-            ],
+          $and: [
+            {
+              $eq: [
+                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                new Date().getFullYear(),
+              ],
+            },
+            {
+              $in: [
+                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                [
+                  startOfWeekThreeWeeksAgo,
+                  startOfWeekTwoWeeksAgo,
+                  startOfWeekPreviousWeek,
+                ],
+              ],
+            },
           ],
         },
       },
