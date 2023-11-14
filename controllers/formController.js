@@ -56,12 +56,10 @@ export const addFormData = async (req, res) => {
                   currentWeek,
                 ],
               },
-              {
-                lga: lga ? lga : req.enuumerator.LGA[0],
-              },
             ],
           },
         },
+        { lga: lga ? lga : req.enumerator.LGA[0] },
         // additionalQueryParams,
       ],
     };
