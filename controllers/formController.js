@@ -43,13 +43,23 @@ export const addFormData = async (req, res) => {
       $and: [
         {
           $expr: {
-            $eq: [
-              { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-              currentWeek,
+            $and: [
+              {
+                $eq: [
+                  { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+                  new Date().getFullYear(),
+                ],
+              },
+              {
+                $eq: [
+                  { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+                  currentWeek,
+                ],
+              },
             ],
           },
         },
-        { lga: lga ? lga : req.enumerator.LGA[0] },
+        additionalQueryParams,
       ],
     };
     const alreadySubmited = await Form.find(query);
