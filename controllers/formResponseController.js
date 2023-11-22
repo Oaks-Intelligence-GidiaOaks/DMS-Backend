@@ -194,11 +194,31 @@ export const flagFoodProduct = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
         updated_by: req.user._id,
       }
     );
 
     res.status(200).json({ message: "Food Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/resubmit_food_product/id
+export const reSubmitFoodProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Product.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: false,
+        approved: 1,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "Food Product submitted sucessfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -350,6 +370,26 @@ export const flagClothingProduct = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "Clothing Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const resubmitClothingProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Clothing.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: false,
+        approved: 1,
         updated_by: req.user._id,
       }
     );
@@ -522,6 +562,26 @@ export const flagTransport = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "transport Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const resubmitTransport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Transport.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        approved: 1,
         updated_by: req.user._id,
       }
     );
@@ -694,6 +754,28 @@ export const flagAccomodation = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
+        updated_by: req.user._id,
+      }
+    );
+
+    res
+      .status(200)
+      .json({ message: "accomodation Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const resubmitAccomodation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Accomodation.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        approved: 1,
         updated_by: req.user._id,
       }
     );
@@ -860,6 +942,28 @@ export const flagElectricity = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
+        updated_by: req.user._id,
+      }
+    );
+
+    res
+      .status(200)
+      .json({ message: "electricity Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const resubmitElectricity = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Electricity.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        approved: 1,
         updated_by: req.user._id,
       }
     );
@@ -1029,6 +1133,26 @@ export const flagQuestion = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "question Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+//flag food product api/v1/form_response/flag_food_product/id
+export const resubmitQuestion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Question.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        approved: 1,
         updated_by: req.user._id,
       }
     );
@@ -1215,6 +1339,25 @@ export const flagOtherProduct = async (req, res) => {
       { _id: id },
       {
         flagged: true,
+        approved: 0,
+        updated_by: req.user._id,
+      }
+    );
+
+    res.status(200).json({ message: "other Product flagged sucessfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+//flag food product api/v1/form_response/flag_food_product/id
+export const resubmitOtherProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await OtherProduct.findByIdAndUpdate(
+      { _id: id },
+      {
+        flagged: true,
+        approved: 1,
         updated_by: req.user._id,
       }
     );
