@@ -170,7 +170,7 @@ export const updateFoodProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price, brand, size } = req.body;
-    await Product.findByIdAndUpdate(
+    const data = await Product.findByIdAndUpdate(
       { _id: id },
       {
         name,
@@ -181,7 +181,7 @@ export const updateFoodProduct = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Food Product flagged sucessfully" });
+    res.status(200).json({ message: "Food Product updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -190,7 +190,7 @@ export const updateFoodProduct = async (req, res) => {
 export const flagFoodProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    await Product.findByIdAndUpdate(
+    const data = await Product.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -199,7 +199,7 @@ export const flagFoodProduct = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Food Product flagged sucessfully" });
+    res.status(200).json({ message: "Food Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -366,7 +366,7 @@ export const getPrevClothingProduct = async (req, res) => {
 export const flagClothingProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    await Clothing.findByIdAndUpdate(
+    const data = await Clothing.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -375,7 +375,9 @@ export const flagClothingProduct = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Clothing Product flagged sucessfully" });
+    res
+      .status(200)
+      .json({ message: "Clothing Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -405,7 +407,7 @@ export const updateClothingProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { category, price, sub_category, size } = req.body;
-    await Clothing.findByIdAndUpdate(
+    const data = await Clothing.findByIdAndUpdate(
       { _id: id },
       {
         category,
@@ -416,7 +418,9 @@ export const updateClothingProduct = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Clothing Product updated sucessfully" });
+    res
+      .status(200)
+      .json({ message: "Clothing Product updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -558,7 +562,7 @@ export const getPrevTransport = async (req, res) => {
 export const flagTransport = async (req, res) => {
   try {
     const { id } = req.params;
-    await Transport.findByIdAndUpdate(
+    const data = await Transport.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -567,7 +571,9 @@ export const flagTransport = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "transport Product flagged sucessfully" });
+    res
+      .status(200)
+      .json({ message: "transport Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -597,7 +603,7 @@ export const updateTransport = async (req, res) => {
   try {
     const { id } = req.params;
     const { route, mode, cost } = req.body;
-    await Transport.findByIdAndUpdate(
+    const data = await Transport.findByIdAndUpdate(
       { _id: id },
       {
         route,
@@ -607,7 +613,7 @@ export const updateTransport = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Transport updated sucessfully" });
+    res.status(200).json({ message: "Transport updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -750,7 +756,7 @@ export const getPrevAccomodation = async (req, res) => {
 export const flagAccomodation = async (req, res) => {
   try {
     const { id } = req.params;
-    await Accomodation.findByIdAndUpdate(
+    const data = await Accomodation.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -761,7 +767,7 @@ export const flagAccomodation = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "accomodation Product flagged sucessfully" });
+      .json({ message: "accomodation Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -793,7 +799,7 @@ export const updateAccomodation = async (req, res) => {
   try {
     const { id } = req.params;
     const { type, price, rooms } = req.body;
-    await Accomodation.findByIdAndUpdate(
+    const data = await Accomodation.findByIdAndUpdate(
       { _id: id },
       {
         type,
@@ -803,7 +809,7 @@ export const updateAccomodation = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Accomodation updated sucessfully" });
+    res.status(200).json({ message: "Accomodation updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -938,7 +944,7 @@ export const getPrevElectricity = async (req, res) => {
 export const flagElectricity = async (req, res) => {
   try {
     const { id } = req.params;
-    await Electricity.findByIdAndUpdate(
+    const data = await Electricity.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -949,7 +955,7 @@ export const flagElectricity = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "electricity Product flagged sucessfully" });
+      .json({ message: "electricity Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -981,7 +987,7 @@ export const updateElectricity = async (req, res) => {
   try {
     const { id } = req.params;
     const { hours_per_week } = req.body;
-    await Electricity.findByIdAndUpdate(
+    const data = await Electricity.findByIdAndUpdate(
       { _id: id },
       {
         hours_per_week,
@@ -989,7 +995,7 @@ export const updateElectricity = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Electricity updated sucessfully" });
+    res.status(200).json({ message: "Electricity updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1129,7 +1135,7 @@ export const getPrevQuestion = async (req, res) => {
 export const flagQuestion = async (req, res) => {
   try {
     const { id } = req.params;
-    await Question.findByIdAndUpdate(
+    const data = await Question.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -1138,7 +1144,9 @@ export const flagQuestion = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "question Product flagged sucessfully" });
+    res
+      .status(200)
+      .json({ message: "question Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1177,7 +1185,7 @@ export const updateQuestions = async (req, res) => {
       note,
       team_lead_note,
     } = req.body;
-    await Question.findByIdAndUpdate(
+    const data = await Question.findByIdAndUpdate(
       { _id: id },
       {
         government_project,
@@ -1192,7 +1200,7 @@ export const updateQuestions = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Questions updated sucessfully" });
+    res.status(200).json({ message: "Questions updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1335,7 +1343,7 @@ export const getPrevOtherProduct = async (req, res) => {
 export const flagOtherProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    await OtherProduct.findByIdAndUpdate(
+    const data = await OtherProduct.findByIdAndUpdate(
       { _id: id },
       {
         flagged: true,
@@ -1344,7 +1352,9 @@ export const flagOtherProduct = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "other Product flagged sucessfully" });
+    res
+      .status(200)
+      .json({ message: "other Product flagged sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -1373,7 +1383,7 @@ export const updateOtherProducts = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, price, brand, size } = req.body;
-    await OtherProduct.findByIdAndUpdate(
+    const data = await OtherProduct.findByIdAndUpdate(
       { _id: id },
       {
         name,
@@ -1384,7 +1394,9 @@ export const updateOtherProducts = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "Other Products updated sucessfully" });
+    res
+      .status(200)
+      .json({ message: "Other Products updated sucessfully", data });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
