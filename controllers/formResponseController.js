@@ -87,12 +87,12 @@ export const getFoodProduct = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -105,9 +105,11 @@ export const getFoodProduct = async (req, res) => {
 
   try {
     const totalCount = await Product.countDocuments(query);
-    const data = await Product.find(query).populate({
-      path: "created_by",
-    });
+    const data = await Product.find(query)
+      .populate({
+        path: "created_by",
+      })
+      .sort({ created_at: -1 });
     // .skip(skip)
     // .limit(20);
 
@@ -284,12 +286,12 @@ export const getClothingProduct = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -483,12 +485,12 @@ export const getTransport = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -676,12 +678,12 @@ export const getAccomodation = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -864,12 +866,12 @@ export const getElectricity = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -1055,12 +1057,12 @@ export const getQuestions = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -1263,12 +1265,12 @@ export const getOtherProducts = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
