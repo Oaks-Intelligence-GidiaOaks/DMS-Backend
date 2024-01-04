@@ -55,12 +55,12 @@ export const getResponseTracker = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
@@ -543,12 +543,12 @@ export const getAdminResponseTracker = async (req, res) => {
                 new Date().getFullYear(),
               ],
             },
-            {
-              $eq: [
-                { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
+            // {
+            //   $eq: [
+            //     { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
+            //     currentWeek,
+            //   ],
+            // },
           ],
         },
       },
