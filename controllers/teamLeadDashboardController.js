@@ -67,7 +67,16 @@ const previousWeekNos = [
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
 
+// Get today's date
 const today = new Date();
+
+// Find the first day of the week (Sunday)
+const firstDayOfWeek = new Date(today);
+firstDayOfWeek.setDate(today.getDate() - today.getDay());
+
+// Find the last day of the week (Saturday)
+const lastDayOfWeek = new Date(today);
+lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
@@ -344,22 +353,28 @@ export const getSubmisionRate = async (req, res) => {
   query2.disabled = false;
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       {
+      //         $eq: [
+      //           { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           currentWeek,
+      //         ],
+      //       },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            {
-              $eq: [
-                { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                currentWeek,
-              ],
-            },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,

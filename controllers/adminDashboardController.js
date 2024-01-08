@@ -63,7 +63,16 @@ const previousWeekNos = [
 ];
 const currentYear = currentDate.getFullYear();
 const currentMonth = currentDate.getMonth() + 1;
+// Get today's date
 const today = new Date();
+
+// Find the first day of the week (Sunday)
+const firstDayOfWeek = new Date(today);
+firstDayOfWeek.setDate(today.getDate() - today.getDay());
+
+// Find the last day of the week (Saturday)
+const lastDayOfWeek = new Date(today);
+lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
 const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
