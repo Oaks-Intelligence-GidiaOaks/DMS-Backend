@@ -25,8 +25,25 @@ const getWeekNumber = (date) => {
 
 const currentWeek = getWeekNumber(new Date());
 
+// Get today's date
+const today = new Date();
+
+// Find the first day of the week (Sunday)
+const firstDayOfWeek = new Date(today);
+firstDayOfWeek.setDate(today.getDate() - today.getDay());
+
+// Find the last day of the week (Saturday)
+const lastDayOfWeek = new Date(today);
+lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
+
+// Format the dates for better readability (assuming MM/DD/YYYY format)
+// const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+// const formattedFirstDay = firstDayOfWeek.toLocaleDateString("en-US", options);
+// const formattedLastDay = lastDayOfWeek.toLocaleDateString("en-US", options);
+
 const threeWeeksAgo = new Date();
 threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21); // 7 days * 3 weeks
+
 const startOfWeekThreeWeeksAgo = getWeekNumber(threeWeeksAgo);
 const startOfWeekTwoWeeksAgo = startOfWeekThreeWeeksAgo + 1;
 const startOfWeekPreviousWeek = startOfWeekThreeWeeksAgo + 2;
@@ -71,35 +88,40 @@ export const getFoodProduct = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
-    additionalQueryParams.approved = 0;
+    // additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
   }
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       {
+      //         $eq: [
+      //           { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           currentWeek,
+      //         ],
+      //       },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
     ],
   };
-
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
 
@@ -277,22 +299,28 @@ export const getClothingProduct = async (req, res) => {
   }
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       // {
+      //       //   $eq: [
+      //       //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //       //     currentWeek,
+      //       //   ],
+      //       // },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
@@ -476,22 +504,28 @@ export const getTransport = async (req, res) => {
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       // {
+      //       //   $eq: [
+      //       //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //       //     currentWeek,
+      //       //   ],
+      //       // },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
@@ -669,22 +703,28 @@ export const getAccomodation = async (req, res) => {
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       // {
+      //       //   $eq: [
+      //       //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //       //     currentWeek,
+      //       //   ],
+      //       // },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
@@ -857,22 +897,28 @@ export const getElectricity = async (req, res) => {
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       // {
+      //       //   $eq: [
+      //       //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //       //     currentWeek,
+      //       //   ],
+      //       // },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
@@ -1048,22 +1094,28 @@ export const getQuestions = async (req, res) => {
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       // {
+      //       //   $eq: [
+      //       //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //       //     currentWeek,
+      //       //   ],
+      //       // },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
@@ -1256,22 +1308,28 @@ export const getOtherProducts = async (req, res) => {
   // query.created_at = { $gte: getLastWeeksDate() };
   const query = {
     $and: [
+      // {
+      //   $expr: {
+      //     $and: [
+      //       {
+      //         $eq: [
+      //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //           new Date().getFullYear(),
+      //         ],
+      //       },
+      //       // {
+      //       //   $eq: [
+      //       //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+      //       //     currentWeek,
+      //       //   ],
+      //       // },
+      //     ],
+      //   },
+      // },
       {
-        $expr: {
-          $and: [
-            {
-              $eq: [
-                { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                new Date().getFullYear(),
-              ],
-            },
-            // {
-            //   $eq: [
-            //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-            //     currentWeek,
-            //   ],
-            // },
-          ],
+        created_at: {
+          $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+          $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
         },
       },
       additionalQueryParams,
