@@ -604,11 +604,15 @@ export const getAdminResponseTracker = async (req, res) => {
         //get response
         const data = Form.find({
           updated_by: { $in: teamLeadIds },
-          $expr: {
-            $eq: [
-              { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
-              currentWeek,
-            ],
+          // $expr: {
+          //   $eq: [
+          //     { $week: { date: "$updated_at", timezone: "Africa/Lagos" } },
+          //     currentWeek,
+          //   ],
+          // },
+          updated_by: {
+            $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+            $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
           },
         }).exec((err, data) => {
           if (err) {
