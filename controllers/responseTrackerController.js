@@ -106,11 +106,16 @@ export const getResponseTracker = async (req, res) => {
         //get response
         const data = Form.find({
           lga: { $in: enumeratorIds },
-          $expr: {
-            $eq: [
-              { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-              currentWeek,
-            ],
+          // $expr: {
+          //   $eq: [
+          //     { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+          //     currentWeek,
+          //   ],
+          // },
+
+          created_at: {
+            $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+            $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
           },
         }).exec((err, data) => {
           if (err) {
