@@ -18,9 +18,9 @@ export const getMasterListData = async (req, res) => {
         $in: req.user.LGA,
       };
     }
-    if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
-      query.approved = 1;
-    }
+    // if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
+    //   query.approved = 1;
+    // }
     const currentPage = page || 1;
     const skip = (currentPage - 1) * 120;
     query.created_at = { $gte: startDate, $lte: endDate };
