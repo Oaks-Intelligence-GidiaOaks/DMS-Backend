@@ -776,6 +776,7 @@ export const updateEnumeratorProfileAdmin = async (req, res) => {
       id: req.body.id,
       state: req.body.state,
       LGA: req.body.LGA,
+      identity: req.body.identity,
     };
 
     const user = await Enumerator.findByIdAndUpdate(
