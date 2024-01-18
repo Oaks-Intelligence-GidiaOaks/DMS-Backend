@@ -88,7 +88,7 @@ export const getFoodProduct = async (req, res) => {
     additionalQueryParams.lga = {
       $in: req.user.LGA,
     };
-    // additionalQueryParams.approved = 0;
+    additionalQueryParams.approved = 0;
   }
   if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
     additionalQueryParams.approved = 1;
