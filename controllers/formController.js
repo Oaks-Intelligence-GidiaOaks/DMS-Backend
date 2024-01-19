@@ -20,6 +20,17 @@ const getWeekNumber = (date) => {
 
 const currentWeek = getWeekNumber(new Date());
 
+// Get today's date
+const today = new Date();
+
+// Find the first day of the week (Sunday)
+const firstDayOfWeek = new Date(today);
+firstDayOfWeek.setDate(today.getDate() - today.getDay());
+
+// Find the last day of the week (Saturday)
+const lastDayOfWeek = new Date(today);
+lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
+
 // add form response data api/v1/form/add_data
 // export const addFormData = catchAsyncErrors(async (req, res, next) => {
 export const addFormData = async (req, res) => {
@@ -41,22 +52,28 @@ export const addFormData = async (req, res) => {
 
     const query = {
       $and: [
+        // {
+        //   $expr: {
+        //     $and: [
+        //       {
+        //         $eq: [
+        //           { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
+        //           new Date().getFullYear(),
+        //         ],
+        //       },
+        //       {
+        //         $eq: [
+        //           { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
+        //           currentWeek,
+        //         ],
+        //       },
+        //     ],
+        //   },
+        // },
         {
-          $expr: {
-            $and: [
-              {
-                $eq: [
-                  { $year: { date: "$created_at", timezone: "Africa/Lagos" } },
-                  new Date().getFullYear(),
-                ],
-              },
-              {
-                $eq: [
-                  { $week: { date: "$created_at", timezone: "Africa/Lagos" } },
-                  currentWeek,
-                ],
-              },
-            ],
+          created_at: {
+            $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
+            $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
           },
         },
         { lga: lga ? lga : req.enumerator.LGA[0] },
