@@ -610,7 +610,7 @@ export const getAdminResponseTracker = async (req, res) => {
           //     currentWeek,
           //   ],
           // },
-          updated_by: {
+          updated_at: {
             $gte: new Date(firstDayOfWeek.toISOString()), // Start of the week
             $lte: new Date(lastDayOfWeek.toISOString()), // End of the week
           },
