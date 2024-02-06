@@ -73,10 +73,13 @@ const today = new Date();
 // Find the first day of the week (Sunday)
 const firstDayOfWeek = new Date(today);
 firstDayOfWeek.setDate(today.getDate() - today.getDay());
+firstDayOfWeek.setHours(0, 0, 0, 0);
 
 // Find the last day of the week (Saturday)
 const lastDayOfWeek = new Date(today);
 lastDayOfWeek.setDate(today.getDate() + (6 - today.getDay()));
+lastDayOfWeek.setHours(0, 0, 0, 0);
+
 const oneMonthAgo = new Date();
 oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 

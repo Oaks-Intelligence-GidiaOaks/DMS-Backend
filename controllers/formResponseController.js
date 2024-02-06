@@ -31,6 +31,7 @@ const today = new Date();
 // Find the first day of the week (Sunday)
 const firstDayOfWeek = new Date(today);
 firstDayOfWeek.setDate(today.getDate() - today.getDay());
+firstDayOfWeek.setHours(0, 0, 0, 0);
 
 // Find the last day of the week (Saturday)
 const lastDayOfWeek = new Date(today);
@@ -124,7 +125,7 @@ export const getFoodProduct = async (req, res) => {
   };
   const currentPage = page || 1;
   const skip = (currentPage - 1) * 10;
-
+  console.log(firstDayOfWeek, lastDayOfWeek);
   try {
     const totalCount = await Product.countDocuments(query);
     const data = await Product.find(query)
