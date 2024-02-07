@@ -17,7 +17,7 @@ export const getMasterListData = async (req, res) => {
       query.lga = {
         $in: req.user.LGA,
       };
-      query.approved = 1;
+      // query.approved = 1;
     }
     if (req?.user?.role === "admin" || req?.user?.role === "super_admin") {
       query.approved = 1;
